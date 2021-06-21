@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Papyrus Compile Directory (Oninus Lactis)",
+            "group": "build",
+            "type": "process",
+            "command": "${config:papyrus.skyrimSpecialEdition.installPath}\\Papyrus Compiler\\PapyrusCompiler.exe",
+            "options": {
+                "cwd": "${config:papyrus.skyrimSpecialEdition.installPath}\\Papyrus Compiler"
+            },
+            "args": [
+                {
+                    "value": "${config:papyrus.skyrimSpecialEdition.installPath}\\Data\\Scripts\\Source\\User",
+                    "quoting": "strong"
+                },
+                {
+                    "value": "-import=${config:papyrus.skyrimSpecialEdition.installPath}\\Data\\Scripts\\Source\\User;${config:papyrus.skyrimSpecialEdition.installPath}\\Data\\Scripts\\Source\\Base",
+                    "quoting": "strong"
+                },
+                {
+                    "value": "-output=${config:papyrus.skyrimSpecialEdition.installPath}\\Data\\Scripts",
+                    "quoting": "strong"
+                },
+                {
+                    "value": "-flags=TESV_Papyrus_Flags.flg",
+                    "quoting": "strong"
+                },
+                {
+                    "value": "-all",
+                    "quoting": "strong"
+                }
+            ],
+            "problemMatcher": []
+        }
+
+    ]
+}
