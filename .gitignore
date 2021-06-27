@@ -1,0 +1,8 @@
+# Compiled source #
+###################
+*.pex
+
+.vscode
+meta.ini
+OninusLactis.code-workspace
+skyrimse.ppj
