@@ -135,25 +135,6 @@ Function SetLevel(int index)
 EndFunction
 
 
-; Updates the offset of the left nipple squirt effect based on 'NippleOffset' which
-; can be adjusted via MCM
-; function UpdateNippleOffset()
-; 	NetImmerse.SetNodeLocalPosition(ActorRef, LactisGroupName, NippleOffset, false)
-;     ActorRef.QueueNiNodeUpdate()
-; endfunction
-
-
-; ; Updates the left debug axis. Changes it's scale depending on whether it is enabled
-; ; in MCM or not. If disabled, scale will be set to 0 to make the axis invisible.
-; Function UpdateDebugAxis() 
-; 	if (DebugAxisEnabled==true)
-; 		NetImmerse.SetNodeScale(ActorRef, LactisAxisName, 0.25, false)
-; 	else
-; 		NetImmerse.SetNodeScale(ActorRef, LactisAxisName, 0, false)
-; 	endif
-;     ActorRef.QueueNiNodeUpdate()
-; EndFunction
-
 ; Updates the left debug axis. Changes it's scale depending on whether it is enabled
 ; in MCM or not. If disabled, scale will be set to 0 to make the axis invisible.
 Function UpdateNodeProperties() 
