@@ -184,7 +184,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level
 	Console("StartNippleSquirtLeft")	
 	playerArmorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1) as LactisNippleSquirtArmor	
 	playerArmorLeftRef.ActorRef = actorRef
-	UpdateArmorProperties(playerArmorLeftRef)
+	UpdateArmorProperties(playerArmorLeftRef, NippleOffsetL)
 	actorRef.AddItem(playerArmorLeftRef, 1, true)
 	; actorRef.EquipItem(playerArmorLeftRef, true, true)
 	actorRef.QueueNiNodeUpdate()
@@ -195,7 +195,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	Console("StartNippleSquirtRight")	
 	playerArmorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1) as LactisNippleSquirtArmor
 	playerArmorRightRef.ActorRef = actorRef
-	UpdateArmorProperties(playerArmorRightRef)
+	UpdateArmorProperties(playerArmorRightRef, NippleOffsetR)
 	actorRef.AddItem(playerArmorRightRef, 1, true)
 	; actorRef.EquipItem(playerArmorRightRef, true, true)
 	actorRef.QueueNiNodeUpdate()
@@ -237,8 +237,11 @@ Function StopNippleSquirtRight(Actor actorRef)
 	Utility.Wait(0.1)		
 EndFunction
 
-Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef)
-	armorRef.NippleOffset = NippleOffsetL
+; Updates the properties of the given armor object reference.
+; Note that all parameters but the nippleOffset applies to the left and right armor and 
+; cannot be controlled individually.
+Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleOffset)
+	armorRef.NippleOffset = nippleOffset
 	armorRef.DebugAxisEnabled = DebugAxisEnabled
 	armorRef.GlobalEmitterScale = GlobalEmitterScale
 	armorRef.UseRandomEmitterScale = UseRandomEmitterScale
@@ -246,13 +249,13 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef)
 	armorRef.UseRandomEmitterDeactivation = UseRandomEmitterDeactivation
 EndFunction
 
-Function UpdateArmorLeftProperties()
-	UpdateArmorProperties(playerArmorLeftRef)
-EndFunction
+; Function UpdateArmorLeftProperties()
+; 	UpdateArmorProperties(playerArmorLeftRef)
+; EndFunction
 
-Function UpdateArmorRightProperties()
-	UpdateArmorProperties(playerArmorRightRef)
-EndFunction
+; Function UpdateArmorRightProperties()
+; 	UpdateArmorProperties(playerArmorRightRef)
+; EndFunction
 
 
 Form Function GetBodyItem(Actor a)
