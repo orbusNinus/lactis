@@ -1,7 +1,6 @@
 Scriptname LactisNippleSquirtArmor extends ObjectReference  
  
 Actor Property ActorRef Auto
-Armor Property ArmorSelf Auto
 Float[] Property NippleOffset Auto
 Float Property GlobalEmitterScale Auto
 Bool Property DebugAxisEnabled Auto
@@ -17,38 +16,46 @@ String Property LactisEmitter2Name Auto
 String Property LactisEmitter3Name Auto
 
 Float[] rot 
+Form baseObject
 
-Event OnInit()
-    Console("OnInit:")   
-    RegisterForSingleUpdate(0.02)
+Event OnInit()    
+    baseObject = self.GetBaseObject()
+    Console("OnInit: self=" + self + ", baseObject=" + baseObject)   
+    Update()
     rot = new Float[3]
 EndEvent
 
-Event OnGameLoad()    
-    Console("OnGameLoad")    
-    rot = new Float[3]
-EndEvent
+; Event OnGameLoad()    
+;     Console("OnGameLoad")
+;     rot = new Float[3]
+; EndEvent
 
-Event OnUnload()
-    Console("OnUnload")
-    ; UnregisterForUpdate()
-    ; Debug.Trace("This object has been unloaded, animations can't be played on it anymore")
-EndEvent
+; Event OnUnload()
+;     Console("OnUnload")
+;     ; UnregisterForUpdate()
+;     ; Debug.Trace("This object has been unloaded, animations can't be played on it anymore")
+; EndEvent
 
-Event OnUnequipped(Actor akActor)
-    Console("OnUnequipped: " + self)
-EndEvent
+; Event OnUnequipped(Actor akActor)
+;     Console("OnUnequipped: self=" + self + ", baseObject=" + baseObject)   
+;     ; DisableNoWait()
+;     ; Delete()
+; EndEvent
 
-Event OnEquipped(Actor akActor)     
-    Console("OnEquipped: ") 
-EndEvent
+; Event OnEquipped(Actor akActor)     
+;     Console("OnEquipped: ") 
+;     ActorRef = None
+; EndEvent
 
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)        
     Console("OnContainerChanged: ") 
     If akNewContainer == ActorRef
         ; Console("OnContainerChanged: new container is ActorRef")        
         float ftimeStart = Utility.GetCurrentRealTime() 
-        ActorRef.EquipItem(self.GetBaseObject(), false, true)
+
+        ; Using "self" instead of "baseObject" does not work, as we will get an 
+        ; Error:  (FF000D17): has no 3d and cannot be equipped.
+        ActorRef.EquipItem(baseObject, true, true)
         float ftimeEnd  = Utility.GetCurrentRealTime() 
         
         ; Utility.Wait(0.05)
@@ -65,9 +72,9 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
     EndIf
 EndEvent
 
-Event OnUpdate()
-    Console("OnUpdate")
-    RegisterForSingleUpdate(3.0)
+Function Update()
+    Console("Update")
+    ; RegisterForSingleUpdate(3.0)
     
     if (UseRandomYRotation == true)
         ; Console("OnUpdate: UseRandomYRotation=" + UseRandomYRotation)
@@ -114,22 +121,21 @@ Event OnUpdate()
         endif
         NetImmerse.SetNodeScale(ActorRef, LactisEmitter3Name, emitterScale, false)
     EndIf
-
-    
-EndEvent
+   
+EndFunction
 
 Function SetLevel(int index)
     Console("index=" + index)
-    ArmorAddon aal = (self.GetBaseObject() as Armor).GetNthArmorAddon(0)
+    ArmorAddon aal = (baseObject as Armor).GetNthArmorAddon(0)
     aal.SetModelPath(levelNifs[index], false, true)
     ; ActorRef.QueueNiNodeUpdate()
 
     ; it seems that QueueNiNodeUpdate() does NOT force the new nif to be shown/loaded.
     ; unfortunately we have to do an UnequipItem/EquipItem cycle
     ; NiSwitchNode support would be gold here
-    ActorRef.UnequipItem(self.GetBaseObject(), true, true)
+    ActorRef.UnequipItem(baseObject, true, true)
     Utility.Wait(0.05)
-    ActorRef.EquipItem(self.GetBaseObject(), true, true)
+    ActorRef.EquipItem(baseObject, true, true)
     Utility.Wait(0.05)
     UpdateNodeProperties()    
 EndFunction
