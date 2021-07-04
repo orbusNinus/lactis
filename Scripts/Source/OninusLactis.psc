@@ -28,9 +28,9 @@ Float fVersion
 Int KeyToggleSwitch = 24 ; Key "O" the letter, not zero, FOR DEBUGGING switch
 
 ; object reference to the left nipple squirt armor
-LactisNippleSquirtArmor playerArmorLeftRef = None
+LactisNippleSquirtArmor playerArmorLeftRef = None 
 ; object reference to the right nipple squirt armor
-LactisNippleSquirtArmor playerArmorRightRef = None
+LactisNippleSquirtArmor playerArmorRightRef = None 
 
 ; --- Internal state variables
 
@@ -54,8 +54,8 @@ Event OnInit()
 EndEvent
 
 Function Maintenance()
-	If fVersion < 0.12 ; <--- Edit this value when updating
-		fVersion = 0.12 ; and this
+	If fVersion < 0.15 ; <--- Edit this value when updating
+		fVersion = 0.15 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -102,7 +102,7 @@ Event OnKeyDown(Int keyCode)
 	Console("**** A registered key has been pressed: "+ keyCode)
 	if (!ostim || (ostim && !ostim.AnimationRunning()))
 		If (keyCode == StartLactatingKey)				
-				ToggleNippleSquirt(PlayerRef)
+			ToggleNippleSquirt(PlayerRef)
 		elseif (keyCode == KeyToggleSwitch)		
 			if (playerArmorLeftRef!=None)
 				if (switch==0)
@@ -149,16 +149,17 @@ Function ToggleNippleSquirt(Actor actorRef)
 	; will mess up *SquirtOn state when we set it after play/stop effects.
 	isLeftSquirtOn = !isLeftSquirtOn
 	isRightSquirtOn = !isRightSquirtOn
-	Console("Lactating " + isLeftSquirtOn)
 	
 	; How long does our operation take?
 	float ftimeStart = Utility.GetCurrentRealTime()
 	if (isLeftSquirtOn!=true) 
 		; Debug.Notification("Nipple squirt right toggled off") 
-		StopNippleSquirtLeft(actorRef)
+		StopNippleSquirt(actorRef, playerArmorLeftRef, playerArmorRightRef)
+		playerArmorLeftRef = None
+		playerArmorRightRef = None
 	Else
 		; Debug.Notification("Nipple squirt left toggled on") 
-		StartNippleSquirtLeft(actorRef)		
+		playerArmorLeftRef = StartNippleSquirtLeft(actorRef)		
 		if NippleLeakEnabled		
 			StartNippleLeak(actorRef, 10)
 		endif
@@ -166,10 +167,11 @@ Function ToggleNippleSquirt(Actor actorRef)
 
 	if (isRightSquirtOn!=true) 
 		; Debug.Notification("Nipple squirt right toggled off") 
-		StopNippleSquirtRight(actorRef)
+		;StopNippleSquirtRight(actorRef, playerArmorRightRef)
+		playerArmorRightRef = None
 	Else
 		; Debug.Notification("Nipple squirt right toggled on") 
-		StartNippleSquirtRight(actorRef)					
+		playerArmorRightRef = StartNippleSquirtRight(actorRef)					
 	EndIf
 	; Long operation here
 	float ftimeEnd = Utility.GetCurrentRealTime()
@@ -182,60 +184,42 @@ EndFunction
 
 LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level=0)
 	Console("StartNippleSquirtLeft")	
-	playerArmorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1) as LactisNippleSquirtArmor	
-	playerArmorLeftRef.ActorRef = actorRef
-	UpdateArmorProperties(playerArmorLeftRef, NippleOffsetL)
-	actorRef.AddItem(playerArmorLeftRef, 1, true)
+	LactisNippleSquirtArmor armorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1) as LactisNippleSquirtArmor	
+	armorLeftRef.ActorRef = actorRef
+	UpdateArmorProperties(armorLeftRef, NippleOffsetL)
+	actorRef.AddItem(armorLeftRef, 1, true)
 	; actorRef.EquipItem(playerArmorLeftRef, true, true)
 	actorRef.QueueNiNodeUpdate()
-	return playerArmorLeftRef
+	return armorLeftRef
 EndFunction
 
 LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int level=0)
 	Console("StartNippleSquirtRight")	
-	playerArmorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1) as LactisNippleSquirtArmor
-	playerArmorRightRef.ActorRef = actorRef
-	UpdateArmorProperties(playerArmorRightRef, NippleOffsetR)
-	actorRef.AddItem(playerArmorRightRef, 1, true)
+	LactisNippleSquirtArmor armorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1) as LactisNippleSquirtArmor
+	armorRightRef.ActorRef = actorRef
+	UpdateArmorProperties(armorRightRef, NippleOffsetR)
+	actorRef.AddItem(armorRightRef, 1, true)
 	; actorRef.EquipItem(playerArmorRightRef, true, true)
 	actorRef.QueueNiNodeUpdate()
-	return playerArmorRightRef
+	return armorRightRef
 EndFunction
 
-Function StopNippleSquirtLeft(Actor actorRef)
-	Console("StopNippleSquirtLeft")
+Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
+	Console("StopNippleSquirt")
 
-	StopNippleLeak(actorRef)
-	
-	; According to the docs the object reference is deleted automatically when RemoveItem() is called
-	actorRef.RemoveItem(playerArmorLeftRef, 1, true)
-	; not sure if QueueNiNodeUpdate or the Wait() call at the end are both necessary
-	if ostim && OStimIntegrationEnabled && ostim.IsInFreeCam() && actorRef == playerref
-		actorRef.QueueNiNodeUpdate()
+	if NippleLeakEnabled	
+		StopNippleLeak(actorRef)
 	endif
-	Console("## playerArmorLeftRef=" + playerArmorLeftRef)
-	; So a manual Delete() will fails as the reference is already deleted by RemoveItem()
-	; playerArmorLeftRef.Delete()
 
-	; is already None here, no need for setting it to None explicitly, but this doesn't 
-	; call anything external so why not be cautios
-	playerArmorLeftRef = None
+	actorRef.RemoveItem(armorLeftRef, 1, true)
+	actorRef.RemoveItem(armorRightRef, 1, true)
+	
+	armorLeftRef = None
+	armorRightRef = None
 
 	Utility.Wait(0.1)
 EndFunction
 
-Function StopNippleSquirtRight(Actor actorRef)
-	Console("StopNippleSquirtRight")
-	
-	; According to the docs the object reference is deleted automatically when RemoveItem() is called
-	actorRef.RemoveItem(playerArmorRightRef, 1, true)
-	
-	if ostim && OStimIntegrationEnabled && ostim.IsInFreeCam() && actorRef == playerref
-		actorRef.QueueNiNodeUpdate()
-	endif
-	playerArmorRightRef = None
-	Utility.Wait(0.1)		
-EndFunction
 
 ; Updates the properties of the given armor object reference.
 ; Note that all parameters but the nippleOffset applies to the left and right armor and 
@@ -248,14 +232,6 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleO
 	armorRef.UseRandomYRotation = UseRandomYRotation
 	armorRef.UseRandomEmitterDeactivation = UseRandomEmitterDeactivation
 EndFunction
-
-; Function UpdateArmorLeftProperties()
-; 	UpdateArmorProperties(playerArmorLeftRef)
-; EndFunction
-
-; Function UpdateArmorRightProperties()
-; 	UpdateArmorProperties(playerArmorRightRef)
-; EndFunction
 
 
 Form Function GetBodyItem(Actor a)
@@ -298,15 +274,6 @@ Function Console(String In) Global
 	Debug.Trace("OninusLactis: " + In)
 EndFunction
 
-; Event OnUpdate()	
-; 	Console("OnUpdate")
-; 	; Bool bKeepUpdating = True
-; 	; ; Do stuff here, and update the bKeepUpdating variable depending on whether you want another update or not
-; 	; If bKeepUpdating
-; 	; 	RegisterForSingleUpdate(1.0)
-; 	; EndIf
-; EndEvent
-
 
 ; ----------------------------- OStim integration
 
@@ -344,8 +311,11 @@ Function PlayOrgasmSquirt()
 	Utility.Wait(OStimOrgasmSquirtDuration)
 
 	Console("Stopping left and right nipple squirt")
-	StopNippleSquirtLeft(orgasmActor)
-	StopNippleSquirtRight(orgasmActor)
+	StopNippleSquirt(orgasmActor, armorLeftRef, armorRightRef)
+	; StopNippleSquirtRight(orgasmActor, armorRightRef)
+
+	armorLeftRef = None
+	armorRightRef = None
 	; if ostim.IsInFreeCam() && subActor == playerref
 	; 	subActor.QueueNiNodeUpdate()
 	; endif
@@ -381,8 +351,8 @@ Function PlaySpankSquirt()
 
 	isAnyOStimSquirtPlaying = true
 
-	StartNippleSquirtLeft(subActor)
-	StartNippleSquirtRight(subActor)
+	LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(subActor)
+	LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(subActor)
 	if NippleLeakEnabled
 		StartNippleLeak(subActor, 10)
 	endif
@@ -390,8 +360,10 @@ Function PlaySpankSquirt()
 	Utility.Wait(OStimSpankSquirtDuration)
 
 	Console("Stopping left and right nipple squirt")
-	StopNippleSquirtLeft(subActor)
-	StopNippleSquirtRight(subActor)
+	StopNippleSquirt(subActor, armorLeftRef, armorRightRef)
+	armorLeftRef = None
+	armorRightRef = None
+
 	; if ostim.IsInFreeCam() && subActor == playerref
 	; 	subActor.QueueNiNodeUpdate()
 	; endif
@@ -408,14 +380,15 @@ Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, For
 	Console("OnOstimSpank: currentAnimClass=" + currentAnimClass)
 	if (isAnyOStimSquirtPlaying || currentAnimClass=="Pf2" || currentAnimClass=="VJ" || currentAnimClass=="Cr" || currentAnimClass=="Po") 
 		isAnyOStimSquirtPlaying = true
-		StartNippleSquirtLeft(subActor)
-		StartNippleSquirtRight(subActor)
+		LactisNippleSquirtArmor armorLeftRef =StartNippleSquirtLeft(subActor)
+		LactisNippleSquirtArmor armorRightRef =StartNippleSquirtRight(subActor)
 		if NippleLeakEnabled
 			StartNippleLeak(subActor, 4)
 		endif
 		Utility.Wait(OStimSpankSquirtDuration)
-		StopNippleSquirtLeft(subActor)
-		StopNippleSquirtRight(subActor)
+		StopNippleSquirt(subActor, armorLeftRef, armorRightRef)		
+		armorLeftRef = None
+		armorRightRef = None	
 		isAnyOStimSquirtPlaying = false
 	endif
 
