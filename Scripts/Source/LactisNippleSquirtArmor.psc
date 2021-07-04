@@ -48,23 +48,23 @@ EndEvent
 ; EndEvent
 
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)        
-    Console("OnContainerChanged: ") 
+    ; Console("OnContainerChanged: ") 
     If akNewContainer == ActorRef
         ; Console("OnContainerChanged: new container is ActorRef")        
-        float ftimeStart = Utility.GetCurrentRealTime() 
+        ; float ftimeStart = Utility.GetCurrentRealTime() 
 
         ; Using "self" instead of "baseObject" does not work, as we will get an 
         ; Error:  (FF000D17): has no 3d and cannot be equipped.
         ActorRef.EquipItem(baseObject, true, true)
-        float ftimeEnd  = Utility.GetCurrentRealTime() 
+        ; float ftimeEnd  = Utility.GetCurrentRealTime() 
         
         ; Utility.Wait(0.05)
         UpdateNodeProperties()
-        float ftimeEnd2  = Utility.GetCurrentRealTime() 
+        ; float ftimeEnd2  = Utility.GetCurrentRealTime() 
         ; Console("## Equipping took " + (ftimeEnd - ftimeStart) + "s. Updating node props took " + (ftimeEnd2-ftimeStart) + "s, " + ", total=" + (ftimeEnd-ftimeStart))
                 
         ; RegisterForSingleUpdate(0.01)
-        ; ActorRef.QueueNiNodeUpdate()        
+        ActorRef.QueueNiNodeUpdate()        
         ; Utility.Wait(0.05)
     Else
         Console("OnContainerChanged: new container is " + akNewContainer)       
@@ -73,21 +73,20 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 EndEvent
 
 Function Update()
-    Console("Update")
+    ; Console("Update")
     ; RegisterForSingleUpdate(3.0)
     
     if (UseRandomYRotation == true)
         ; Console("OnUpdate: UseRandomYRotation=" + UseRandomYRotation)
         NetImmerse.GetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
         rot[2] = Utility.RandomFloat(-10, 10)
-        NetImmerse.SetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
-       
+        NetImmerse.SetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)   
     Else
         ; NetImmerse.SetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
     EndIf
     
     ; Global emitter scale    
-    Console("Applying globalEmitterScale " + GlobalEmitterScale + " to " + LactisGroupName + " node.")
+    ; Console("Applying globalEmitterScale " + GlobalEmitterScale + " to " + LactisGroupName + " node.")
     NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale, false)
 
     if (UseRandomEmitterScale)
@@ -125,7 +124,7 @@ Function Update()
 EndFunction
 
 Function SetLevel(int index)
-    Console("index=" + index)
+    ; Console("index=" + index)
     ArmorAddon aal = (baseObject as Armor).GetNthArmorAddon(0)
     aal.SetModelPath(levelNifs[index], false, true)
     ; ActorRef.QueueNiNodeUpdate()

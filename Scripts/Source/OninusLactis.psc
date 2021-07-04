@@ -54,8 +54,8 @@ Event OnInit()
 EndEvent
 
 Function Maintenance()
-	If fVersion < 0.15 ; <--- Edit this value when updating
-		fVersion = 0.15 ; and this
+	If fVersion < 0.2 ; <--- Edit this value when updating
+		fVersion = 0.2 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -188,7 +188,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level
 	armorLeftRef.ActorRef = actorRef
 	UpdateArmorProperties(armorLeftRef, NippleOffsetL)
 	actorRef.AddItem(armorLeftRef, 1, true)
-	; actorRef.EquipItem(playerArmorLeftRef, true, true)
+	; actorRef.EquipItem(armorLeftRef.GetBaseObject(), true, true)
 	actorRef.QueueNiNodeUpdate()
 	return armorLeftRef
 EndFunction
@@ -199,7 +199,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	armorRightRef.ActorRef = actorRef
 	UpdateArmorProperties(armorRightRef, NippleOffsetR)
 	actorRef.AddItem(armorRightRef, 1, true)
-	; actorRef.EquipItem(playerArmorRightRef, true, true)
+	; actorRef.EquipItem(armorRightRef.GetBaseObject(), true, true)
 	actorRef.QueueNiNodeUpdate()
 	return armorRightRef
 EndFunction
