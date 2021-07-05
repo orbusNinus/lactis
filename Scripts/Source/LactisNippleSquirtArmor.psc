@@ -17,9 +17,11 @@ String Property LactisEmitter3Name Auto
 
 Float[] rot 
 Form baseObject
+ArmorAddon armorAA
 
 Event OnInit()    
     baseObject = self.GetBaseObject()
+    armorAA = (baseObject as Armor).GetNthArmorAddon(0)
     Console("OnInit: self=" + self + ", baseObject=" + baseObject)   
     Update()
     rot = new Float[3]
@@ -58,14 +60,15 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
         ActorRef.EquipItem(baseObject, true, true)
         ; float ftimeEnd  = Utility.GetCurrentRealTime() 
         
-        ; Utility.Wait(0.05)
+        ; waiting after equippingn will somehow fix the "freecam blocks alignment/netimmerse update" problem        
+        Utility.Wait(0.05)
         UpdateNodeProperties()
         ; float ftimeEnd2  = Utility.GetCurrentRealTime() 
         ; Console("## Equipping took " + (ftimeEnd - ftimeStart) + "s. Updating node props took " + (ftimeEnd2-ftimeStart) + "s, " + ", total=" + (ftimeEnd-ftimeStart))
                 
         ; RegisterForSingleUpdate(0.01)
         ActorRef.QueueNiNodeUpdate()        
-        ; Utility.Wait(0.05)
+        Utility.Wait(0.05)
     Else
         Console("OnContainerChanged: new container is " + akNewContainer)       
         ; armor was unequipped (isnt acually called?!)
@@ -123,20 +126,23 @@ Function Update()
    
 EndFunction
 
-Function SetLevel(int index)
+Function SetLevel(int index, bool doEquip=true)
     ; Console("index=" + index)
-    ArmorAddon aal = (baseObject as Armor).GetNthArmorAddon(0)
-    aal.SetModelPath(levelNifs[index], false, true)
+    ; ArmorAddon aal = (baseObject as Armor).GetNthArmorAddon(0)
+    armorAA.SetModelPath(levelNifs[index], false, true)
     ; ActorRef.QueueNiNodeUpdate()
 
-    ; it seems that QueueNiNodeUpdate() does NOT force the new nif to be shown/loaded.
-    ; unfortunately we have to do an UnequipItem/EquipItem cycle
-    ; NiSwitchNode support would be gold here
-    ActorRef.UnequipItem(baseObject, true, true)
-    Utility.Wait(0.05)
-    ActorRef.EquipItem(baseObject, true, true)
-    Utility.Wait(0.05)
-    UpdateNodeProperties()    
+    if doEquip
+        ; it seems that QueueNiNodeUpdate() does NOT force the new nif to be shown/loaded.
+        ; unfortunately we have to do an UnequipItem/EquipItem cycle
+        ; NiSwitchNode support would be gold here
+        ActorRef.UnequipItem(baseObject, true, true)
+        Utility.Wait(0.05)
+        ActorRef.EquipItem(baseObject, true, true)
+        Utility.Wait(0.05)
+        UpdateNodeProperties()    
+        ActorRef.QueueNiNodeUpdate()
+    endif
 EndFunction
 
 
