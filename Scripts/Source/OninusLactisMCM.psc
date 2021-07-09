@@ -175,3 +175,33 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
         MiscUtil.PrintConsole("KeyMap Option: Unknown/unsupported/niy option " + Option + " changed.")
     EndIf
 EndEvent
+
+event OnOptionHighlight(int option)
+	{Called when the user highlights an option}
+	
+	if option == optionKeyStartLactating
+		SetInfoText("Key for toggling nipple squirting on/off on the player. Does not work during OStim scenes.")
+	elseIf option == optionOffsetLeftX || option == optionOffsetLeftY || option == optionOffsetLeftZ
+		SetInfoText("Offset for the left nipple squirt emitter origin. Adjust to match the player's body.")
+	elseIf option == optionOffsetRightX || option == optionOffsetRightY || option == optionOffsetRightZ
+		SetInfoText("Offset for the right nipple squirt emitter origin. Adjust to match the player's body.")
+	elseif option == optionGlobalEmitterScale
+		SetInfoText("Global emitter scale for left and right emitters.")
+	elseif option == optionGlobalEmitterScale
+		SetInfoText("Global emitter scale for left and right emitters.")
+	elseif option == optionOStimIntegrationEnabled
+		SetInfoText("Enables OStim integration. Female actors will nipple squirt on spank and orgasm during an OStim scene.")
+	elseif option == optionOStimSpankSquirtDuration
+		SetInfoText("Nipple squirt duration on spank (in seconds).")
+	elseif option == optionOStimOrgasmSquirtDuration
+		SetInfoText("Nipple squirt duration on orgasm (in seconds).")
+	elseif option == optionNippleLeakEnabled
+		SetInfoText("Enables an CBBE overlay texture which simulates nipple leak.")
+	elseif option == optionDebugAxisEnabled
+		SetInfoText("Enables a debug axis for nipple offset adjustments.")
+	elseif option == optionRandomYRotEnabled || option == optionRandomEmitterScaleEnabled || option == optionRandomEmitterDeactivationEnabled
+		SetInfoText("Experimental feature which may result in unpredictable behaviour. Dont't use it.")
+	else 
+		SetInfoText("")
+	endIf
+endEvent
