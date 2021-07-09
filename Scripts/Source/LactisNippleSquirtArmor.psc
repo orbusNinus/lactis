@@ -3,6 +3,7 @@ Scriptname LactisNippleSquirtArmor extends ObjectReference
 Actor Property ActorRef Auto
 Float[] Property NippleOffset Auto
 Float Property GlobalEmitterScale Auto
+Float Property EmitterScale Auto
 Bool Property DebugAxisEnabled Auto
 Bool Property UseRandomYRotation Auto
 Bool Property UseRandomEmitterScale Auto
@@ -22,7 +23,7 @@ ArmorAddon armorAA
 Event OnInit()    
     baseObject = self.GetBaseObject()
     armorAA = (baseObject as Armor).GetNthArmorAddon(0)
-    Console("OnInit: self=" + self + ", baseObject=" + baseObject)   
+    Console("OnInit: self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef)   
     Update()
     rot = new Float[3]
 EndEvent
@@ -90,38 +91,38 @@ Function Update()
     
     ; Global emitter scale    
     ; Console("Applying globalEmitterScale " + GlobalEmitterScale + " to " + LactisGroupName + " node.")
-    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale, false)
+    ; NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale, false)
 
     if (UseRandomEmitterScale)
         ; Console("OnUpdate: UseRandomEmitterScale=" + UseRandomEmitterScale)
         ; emitter wide scale        
         bool emitterOn = true
-        float emitterScale = Utility.RandomFloat(0.5, 1.0)
+        float randomEmitterScale = Utility.RandomFloat(0.5, 1.0)
         if (UseRandomEmitterDeactivation)
             emitterOn = Utility.RandomInt(0,1)
-            if (emitterOn==0)
-                emitterScale = 0.01
+            if (emitterOn==0.0)
+                randomEmitterScale = 0.01
             endif
         endif
-        NetImmerse.SetNodeScale(ActorRef, LactisEmitter1Name, emitterScale, false)
+        NetImmerse.SetNodeScale(ActorRef, LactisEmitter1Name, randomEmitterScale, false)
 
-        emitterScale = Utility.RandomFloat(0.5, 1.0)
+        randomEmitterScale = Utility.RandomFloat(0.5, 1.0)
         if (UseRandomEmitterDeactivation)
             emitterOn = Utility.RandomInt(0,1)
-            if (emitterOn==0)
-                emitterScale = 0.01
+            if (emitterOn==0.0)
+                randomEmitterScale = 0.01
             endif
         endif
-        NetImmerse.SetNodeScale(ActorRef, LactisEmitter2Name, emitterScale, false)
+        NetImmerse.SetNodeScale(ActorRef, LactisEmitter2Name, randomEmitterScale, false)
         
-        emitterScale = Utility.RandomFloat(0.5, 1.0)
+        randomEmitterScale = Utility.RandomFloat(0.5, 1.0)
         if (UseRandomEmitterDeactivation)
             emitterOn = Utility.RandomInt(0,1)
-            if (emitterOn==0)
-                emitterScale = 0.01
+            if (emitterOn==0.0)
+                randomEmitterScale = 0.01
             endif
         endif
-        NetImmerse.SetNodeScale(ActorRef, LactisEmitter3Name, emitterScale, false)
+        NetImmerse.SetNodeScale(ActorRef, LactisEmitter3Name, randomEmitterScale, false)
     EndIf
    
 EndFunction
@@ -155,7 +156,7 @@ Function UpdateNodeProperties()
 		NetImmerse.SetNodeScale(ActorRef, LactisAxisName, 0, false)
 	endif
     NetImmerse.SetNodeLocalPosition(ActorRef, LactisGroupName, NippleOffset, false)
-    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale, false)
+    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale*EmitterScale, false)
     ActorRef.QueueNiNodeUpdate()
 EndFunction
 

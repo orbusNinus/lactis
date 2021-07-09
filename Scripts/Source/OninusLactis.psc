@@ -42,6 +42,9 @@ bool isRightSquirtOn = false
 
 OsexIntegrationMain ostim
 bool isAnyOStimSquirtPlaying = false
+int ostimSpankMax = 10;
+float ostimSquirtScaleMin = 0.75
+float ostimSquirtScaleMax = 2.0
 
 Bool Function HasOStim() 	
 	return ostim!=None
@@ -178,10 +181,8 @@ LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level
 	LactisNippleSquirtArmor armorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1) as LactisNippleSquirtArmor	
 	armorLeftRef.ActorRef = actorRef
 	armorLeftRef.SetLevel(level, false)
-	; UpdateArmorProperties(armorLeftRef, NippleOffsetL)
 	actorRef.AddItem(armorLeftRef, 1, true)
 	UpdateArmorProperties(armorLeftRef, NippleOffsetL)
-	; actorRef.EquipItem(armorLeftRef.GetBaseObject(), true, true)
 	actorRef.QueueNiNodeUpdate()
 	return armorLeftRef
 EndFunction
@@ -191,7 +192,6 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	LactisNippleSquirtArmor armorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1) as LactisNippleSquirtArmor
 	armorRightRef.ActorRef = actorRef
 	armorRightRef.SetLevel(level, false)
-	; UpdateArmorProperties(armorRightRef, NippleOffsetR)
 	actorRef.AddItem(armorRightRef, 1, true)
 	UpdateArmorProperties(armorRightRef, NippleOffsetR)
 	; actorRef.EquipItem(armorRightRef.GetBaseObject(), true, true)
@@ -223,18 +223,16 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleO
 	armorRef.NippleOffset = nippleOffset
 	armorRef.DebugAxisEnabled = DebugAxisEnabled
 	armorRef.GlobalEmitterScale = GlobalEmitterScale
+	if (ostim)
+		armorRef.EmitterScale = MapInterval(ostim.GetSpankCount(), 0.0, ostimSpankMax, ostimSquirtScaleMin, ostimSquirtScaleMax, true)
+	else
+		armorRef.EmitterScale = 1.0
+	endif
 	armorRef.UseRandomEmitterScale = UseRandomEmitterScale
 	armorRef.UseRandomYRotation = UseRandomYRotation
 	armorRef.UseRandomEmitterDeactivation = UseRandomEmitterDeactivation
 	armorRef.UpdateNodeProperties()
 EndFunction
-
-
-; Form Function GetBodyItem(Actor a)
-; 	int mask = armor.GetMaskForSlot(32)
-; 	armor item = a.GetWornForm(mask) as armor
-; 	return item
-; EndFunction
 
 
 Function RemapStartLactatingKey(Int zKey)
@@ -249,6 +247,26 @@ Function Console(String In) Global
 	Debug.Trace("OninusLactis: " + In)
 EndFunction
 
+
+; Maps the specified value val from the interval defined by srcMin and 
+; srcMax to the interval defined by dstMin and dstMax.
+; <returns>The value val mapped to the destination interval.</returns>
+; <param name='srcMin'>The minimum value of the source interval.</param>
+; <param name='srcMax'>The maximum value of the source interval.</param>
+; <param name='dstMin'>The minimum value of the destination interval.</param>
+; <param name='dstMax'>The maximum value of the destination interval.</param>
+; <param name='clamp'>Clamp values outside [dstMin..dstMax] or not.</param>
+float Function MapInterval(float val, float srcMin, float srcMax, float dstMin, float dstMax, bool clamp) global
+	if clamp
+		if (val>=srcMax) 
+			return dstMax
+		endif
+		if (val<=srcMin) 
+			return dstMin
+		endif
+	endif
+	return dstMin + (val-srcMin) / (srcMax-srcMin) * (dstMax-dstMin)
+EndFunction	
 
 ; ----------------------------- OStim integration
 
@@ -269,7 +287,8 @@ Function PlayOrgasmSquirt()
 	Actor orgasmActor = ostim.GetMostRecentOrgasmedActor()
 	Console("PlayOrgasmSquirt: Last orgasmed actor is " + orgasmActor)
 
-	if (!ostim.IsNaked(orgasmActor) || !ostim.AppearsFemale(orgasmActor)) 
+	; if (!ostim.IsNaked(orgasmActor) || !ostim.AppearsFemale(orgasmActor)) 
+	if (!ostim.AppearsFemale(orgasmActor)) 
 		Console("PlayOrgasmSquirt: Orgasm squirt cancelled. isAnyOStimSquirtPlaying=" + isAnyOStimSquirtPlaying + ", ostim.IsNaked(orgasmActor)=" + ostim.IsNaked(orgasmActor) + ", ostim.IsFemale(orgasmActor)=" + ostim.IsFemale(orgasmActor) + ", AppearsFemale=" + ostim.AppearsFemale(orgasmActor))
 		return
 	endif
@@ -317,12 +336,15 @@ Function PlaySpankSquirt()
 	; on a female player with the SOS Futanari schlong attached IsFemale==false and the spank squirt will not be played
 	; thus we use AppearsFemale().. 
 	; TODO: i guess this could be cached at OnOstimPrestart
-	if (!ostim.IsNaked(subActor) || !ostim.AppearsFemale(subActor)) 
+	; if (!ostim.IsNaked(subActor) || !ostim.AppearsFemale(subActor)) 
+	if (!ostim.AppearsFemale(subActor)) 
 		Console("PlaySpankSquirt: Spank squirt cancelled. isAnyOStimSquirtPlaying=" + isAnyOStimSquirtPlaying + ", ostim.IsNaked(subActor)=" + ostim.IsNaked(subActor) + ", ostim.IsFemale(subActor)=" + ostim.IsFemale(subActor) + ", AppearsFemale=" + ostim.AppearsFemale(subActor))
 		return
 	endif
 
 	isAnyOStimSquirtPlaying = true
+
+	Console("PlaySpankSquirt: ostim.GetMaxSpanksAllowed=" + ostim.GetMaxSpanksAllowed() + ", ostim.GetSpankCount" + ostim.GetSpankCount())
 
 	LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(subActor, 0)
 	LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(subActor, 0)
@@ -336,7 +358,7 @@ Function PlaySpankSquirt()
 
 	Utility.Wait(OStimSpankSquirtDuration)
 
-	Console("Stopping left and right nipple squirt")
+	
 	StopNippleSquirt(subActor, armorLeftRef, armorRightRef)
 	armorLeftRef = None
 	armorRightRef = None
@@ -357,8 +379,8 @@ Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, For
 	Console("OnOstimSpank: currentAnimClass=" + currentAnimClass)
 	if (isAnyOStimSquirtPlaying || currentAnimClass=="Pf2" || currentAnimClass=="VJ" || currentAnimClass=="Cr" || currentAnimClass=="Po") 
 		isAnyOStimSquirtPlaying = true
-		LactisNippleSquirtArmor armorLeftRef =StartNippleSquirtLeft(subActor, 1)
-		LactisNippleSquirtArmor armorRightRef =StartNippleSquirtRight(subActor, 1)
+		LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(subActor, 1)
+		LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(subActor, 1)
 		if NippleLeakEnabled
 			StartNippleLeak(subActor, 4)
 		endif
@@ -373,6 +395,7 @@ EndEvent
 
 Event OnOStimPrestart(string eventName, string strArg, float numArg, Form sender)
 	Console("OnOStimPrestart")
+	ostim.SetSpankMax(ostimSpankMax)
 endevent
 
 Event OnOStimEnd(string eventName, string strArg, float numArg, Form sender)
