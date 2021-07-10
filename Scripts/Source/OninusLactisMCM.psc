@@ -14,6 +14,7 @@ Int optionGlobalEmitterScale
 Int optionOStimIntegrationEnabled
 Int optionOStimSpankSquirtDuration
 Int optionOStimOrgasmSquirtDuration
+Int optionOStimNonNakedSquirtEnabled
 Int optionNippleLeakEnabled
 Int optionDebugAxisEnabled
 Int optionRandomYRotEnabled
@@ -48,6 +49,7 @@ Event OnPageReset(string page)
 			optionOStimIntegrationEnabled = AddToggleOption("Enable OStim integration", Main.OStimIntegrationEnabled)
 			optionOStimSpankSquirtDuration = AddSliderOption("Spank squirt duration", Main.OStimSpankSquirtDuration, "{2}")        
 			optionOStimOrgasmSquirtDuration = AddSliderOption("Orgasm squirt duration", Main.OStimOrgasmSquirtDuration, "{2}")        
+			optionOStimNonNakedSquirtEnabled = AddToggleOption("Nipple squirt when not naked", Main.OStimNonNakedSquirtEnabled)
 		endif		
 		AddHeaderOption("Debug")
 		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 
@@ -63,6 +65,9 @@ event OnOptionSelect(int option)
 	if (option == optionOStimIntegrationEnabled)
 		Main.OStimIntegrationEnabled = !Main.OStimIntegrationEnabled
 		SetToggleOptionValue(optionOStimIntegrationEnabled, Main.OStimIntegrationEnabled)
+	elseif (option == optionOStimNonNakedSquirtEnabled)
+		Main.OStimNonNakedSquirtEnabled = !Main.OStimNonNakedSquirtEnabled
+		SetToggleOptionValue(optionOStimNonNakedSquirtEnabled, Main.OStimNonNakedSquirtEnabled)
 	elseif (option == optionNippleLeakEnabled)
 		Main.NippleLeakEnabled = !Main.NippleLeakEnabled
 		SetToggleOptionValue(optionNippleLeakEnabled, Main.NippleLeakEnabled)		
@@ -195,6 +200,8 @@ event OnOptionHighlight(int option)
 		SetInfoText("Nipple squirt duration on spank (in seconds).")
 	elseif option == optionOStimOrgasmSquirtDuration
 		SetInfoText("Nipple squirt duration on orgasm (in seconds).")
+	elseif option == optionOStimNonNakedSquirtEnabled
+		SetInfoText("Nipple squirt even when actor is not naked. This might help with revealing armors/clothing.")
 	elseif option == optionNippleLeakEnabled
 		SetInfoText("Enables an CBBE overlay texture which simulates nipple leak.")
 	elseif option == optionDebugAxisEnabled

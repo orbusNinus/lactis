@@ -16,6 +16,7 @@ Float Property GlobalEmitterScale Auto
 Bool Property OStimIntegrationEnabled Auto
 Float Property OStimSpankSquirtDuration Auto
 Float Property OStimOrgasmSquirtDuration Auto
+Bool Property OStimNonNakedSquirtEnabled Auto
 Bool Property NippleLeakEnabled Auto
 Bool Property DebugAxisEnabled Auto
 Bool Property UseRandomYRotation Auto
@@ -57,8 +58,8 @@ Event OnInit()
 EndEvent
 
 Function Maintenance()
-	If fVersion < 0.22 ; <--- Edit this value when updating
-		fVersion = 0.22 ; and this
+	If fVersion < 0.23 ; <--- Edit this value when updating
+		fVersion = 0.23 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -282,13 +283,11 @@ Function PlayOrgasmSquirt()
 	if (isAnyOStimSquirtPlaying)
 		return
 	endif
-	
-	; Assuming the subactor is getting spanked... dont know how to query who is spanked
+		
 	Actor orgasmActor = ostim.GetMostRecentOrgasmedActor()
 	Console("PlayOrgasmSquirt: Last orgasmed actor is " + orgasmActor)
 
-	; if (!ostim.IsNaked(orgasmActor) || !ostim.AppearsFemale(orgasmActor)) 
-	if (!ostim.AppearsFemale(orgasmActor)) 
+	if !ostim.AppearsFemale(orgasmActor) || (!ostim.IsNaked(orgasmActor) && !OStimNonNakedSquirtEnabled)
 		Console("PlayOrgasmSquirt: Orgasm squirt cancelled. isAnyOStimSquirtPlaying=" + isAnyOStimSquirtPlaying + ", ostim.IsNaked(orgasmActor)=" + ostim.IsNaked(orgasmActor) + ", ostim.IsFemale(orgasmActor)=" + ostim.IsFemale(orgasmActor) + ", AppearsFemale=" + ostim.AppearsFemale(orgasmActor))
 		return
 	endif
@@ -304,7 +303,6 @@ Function PlayOrgasmSquirt()
 
 	Console("Stopping left and right nipple squirt")
 	StopNippleSquirt(orgasmActor, armorLeftRef, armorRightRef)
-	; StopNippleSquirtRight(orgasmActor, armorRightRef)
 
 	armorLeftRef = None
 	armorRightRef = None
@@ -337,7 +335,7 @@ Function PlaySpankSquirt()
 	; thus we use AppearsFemale().. 
 	; TODO: i guess this could be cached at OnOstimPrestart
 	; if (!ostim.IsNaked(subActor) || !ostim.AppearsFemale(subActor)) 
-	if (!ostim.AppearsFemale(subActor)) 
+	if !ostim.AppearsFemale(subActor) || (!ostim.IsNaked(subActor) && !OStimNonNakedSquirtEnabled)
 		Console("PlaySpankSquirt: Spank squirt cancelled. isAnyOStimSquirtPlaying=" + isAnyOStimSquirtPlaying + ", ostim.IsNaked(subActor)=" + ostim.IsNaked(subActor) + ", ostim.IsFemale(subActor)=" + ostim.IsFemale(subActor) + ", AppearsFemale=" + ostim.AppearsFemale(subActor))
 		return
 	endif
@@ -357,7 +355,6 @@ Function PlaySpankSquirt()
 	endif
 
 	Utility.Wait(OStimSpankSquirtDuration)
-
 	
 	StopNippleSquirt(subActor, armorLeftRef, armorRightRef)
 	armorLeftRef = None
