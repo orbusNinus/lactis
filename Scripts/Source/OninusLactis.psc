@@ -46,15 +46,12 @@ int ostimSpankMax = 10;
 float ostimSquirtScaleMin = 0.75
 float ostimSquirtScaleMax = 2.0
 
-Bool Function HasOStim() 	
-	return ostim!=None
-EndFunction
-
 Event OnInit()
 	Debug.Notification("OninusLactis installed.")	
 	; RegisterForSingleUpdate(10.0) ; Give us a single update in one second
 	Maintenance()
 EndEvent
+
 
 Function Maintenance()
 	If fVersion < 0.23 ; <--- Edit this value when updating
@@ -116,6 +113,12 @@ Event OnKeyDown(Int keyCode)
 	endif
 
 EndEvent
+
+; Used by the MCM script. When querying OStim during gameplay the ostim varibale
+; should be checked directly for performance reasons.
+Bool Function HasOStim() 	
+	return ostim!=None
+EndFunction
 
 
 ; ----------------------------- Nipple leak
