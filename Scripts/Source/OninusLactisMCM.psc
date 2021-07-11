@@ -7,9 +7,9 @@ Int optionKeyStartLactating
 Int optionOffsetLeftX
 Int optionOffsetLeftY
 Int optionOffsetLeftZ
-Int optionOffsetRightX
-Int optionOffsetRightY
-Int optionOffsetRightZ
+; Int optionOffsetRightX
+; Int optionOffsetRightY
+; Int optionOffsetRightZ
 Int optionGlobalEmitterScale
 Int optionOStimIntegrationEnabled
 Int optionOStimSpankSquirtDuration
@@ -36,14 +36,14 @@ Event OnPageReset(string page)
         SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Keyboard (Manual mode)")        
         optionKeyStartLactating = AddKeyMapOption("Toggle nipple squirt L&R key", Main.StartLactatingKey)
-		AddHeaderOption("Nipple Offset Left")
+		AddHeaderOption("Nipple Offset")
         optionOffsetLeftX = AddSliderOption("Left / Right", Main.NippleOffsetL[0], "{2}")        
         optionOffsetLeftY = AddSliderOption("Up / Down", Main.NippleOffsetL[2], "{2}")
         optionOffsetLeftZ = AddSliderOption("Back / Forth", Main.NippleOffsetL[1], "{2}")
-		AddHeaderOption("Nipple Offset Right")
-        optionOffsetRightX = AddSliderOption("Left / Right", Main.NippleOffsetR[0], "{2}")        
-        optionOffsetRightY = AddSliderOption("Up / Down", Main.NippleOffsetR[2], "{2}")
-        optionOffsetRightZ = AddSliderOption("Back / Forth", Main.NippleOffsetR[1], "{2}")
+		; AddHeaderOption("Nipple Offset Right")
+        ; optionOffsetRightX = AddSliderOption("Left / Right", Main.NippleOffsetR[0], "{2}")        
+        ; optionOffsetRightY = AddSliderOption("Up / Down", Main.NippleOffsetR[2], "{2}")
+        ; optionOffsetRightZ = AddSliderOption("Back / Forth", Main.NippleOffsetR[1], "{2}")
 		if Main.HasOStim()
 			AddHeaderOption("OStim integration")
 			optionOStimIntegrationEnabled = AddToggleOption("Enable OStim integration", Main.OStimIntegrationEnabled)
@@ -51,10 +51,11 @@ Event OnPageReset(string page)
 			optionOStimOrgasmSquirtDuration = AddSliderOption("Orgasm squirt duration", Main.OStimOrgasmSquirtDuration, "{2}")        
 			optionOStimNonNakedSquirtEnabled = AddToggleOption("Nipple squirt when not naked", Main.OStimNonNakedSquirtEnabled)
 		endif		
-		AddHeaderOption("Debug")
-		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 
 		optionNippleLeakEnabled = AddToggleOption("Enable nipple leak (CBBE EffectShader)", Main.NippleLeakEnabled)
-        optionDebugAxisEnabled = AddToggleOption("Enable debug axis", Main.DebugAxisEnabled)
+		AddHeaderOption("Debug")
+		optionDebugAxisEnabled = AddToggleOption("Enable debug axis", Main.DebugAxisEnabled)
+		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 		        
+		AddHeaderOption("Experimental")
 		optionRandomYRotEnabled = AddToggleOption("Enable random Y rotation", Main.UseRandomYRotation)
 		optionRandomEmitterScaleEnabled = AddToggleOption("Enable random emitter scale", Main.UseRandomEmitterScale)
 		optionRandomEmitterDeactivationEnabled = AddToggleOption("Enable random emitter deactivation", Main.UseRandomEmitterDeactivation)
@@ -102,21 +103,21 @@ event OnOptionSliderOpen(int option)
 		SetSliderDialogDefaultValue(0.0)
 		SetSliderDialogRange(-7, 7)
 		SetSliderDialogInterval(0.1)
-	elseif (option == optionOffsetRightX)
-		SetSliderDialogStartValue(Main.NippleOffsetR[0])
-		SetSliderDialogDefaultValue(0.0)
-		SetSliderDialogRange(-7, 7)
-		SetSliderDialogInterval(0.1)
-	elseIf (option == optionOffsetRightY)
-		SetSliderDialogStartValue(Main.NippleOffsetR[2])
-		SetSliderDialogDefaultValue(0.0)
-		SetSliderDialogRange(-7, 7)
-		SetSliderDialogInterval(0.1)
-	elseIf (option == optionOffsetRightZ)
-		SetSliderDialogStartValue(Main.NippleOffsetR[1])
-		SetSliderDialogDefaultValue(0.0)
-		SetSliderDialogRange(-7, 7)
-		SetSliderDialogInterval(0.1)
+	; elseif (option == optionOffsetRightX)
+	; 	SetSliderDialogStartValue(Main.NippleOffsetR[0])
+	; 	SetSliderDialogDefaultValue(0.0)
+	; 	SetSliderDialogRange(-7, 7)
+	; 	SetSliderDialogInterval(0.1)
+	; elseIf (option == optionOffsetRightY)
+	; 	SetSliderDialogStartValue(Main.NippleOffsetR[2])
+	; 	SetSliderDialogDefaultValue(0.0)
+	; 	SetSliderDialogRange(-7, 7)
+	; 	SetSliderDialogInterval(0.1)
+	; elseIf (option == optionOffsetRightZ)
+	; 	SetSliderDialogStartValue(Main.NippleOffsetR[1])
+	; 	SetSliderDialogDefaultValue(0.0)
+	; 	SetSliderDialogRange(-7, 7)
+	; 	SetSliderDialogInterval(0.1)
 	elseIf (option == optionGlobalEmitterScale)
 		SetSliderDialogStartValue(Main.GlobalEmitterScale)
 		SetSliderDialogDefaultValue(1.0)
@@ -138,26 +139,28 @@ endEvent
 event OnOptionSliderAccept(int option, float value)
 	if (option == optionOffsetLeftX)
 		Main.NippleOffsetL[0] = value
+		Main.NippleOffsetR[0] = -value
 		SetSliderOptionValue(optionOffsetLeftX, Main.NippleOffsetL[0], "{2}")        
-		; Main.UpdateArmorLeftProperties()
+		
 	elseIf (option == optionOffsetLeftY)
 		Main.NippleOffsetL[2] = value
+		Main.NippleOffsetR[2] = value
 		SetSliderOptionValue(optionOffsetLeftY, Main.NippleOffsetL[2], "{2}")        
-		; Main.UpdateArmorLeftProperties()
+		
 	elseIf (option == optionOffsetLeftZ)
 		Main.NippleOffsetL[1] = value
-		SetSliderOptionValue(optionOffsetLeftZ, Main.NippleOffsetL[1], "{2}")        
-		; Main.UpdateArmorLeftProperties()
-	elseif (option == optionOffsetRightX)
-		Main.NippleOffsetR[0] = value
-		SetSliderOptionValue(optionOffsetRightX, Main.NippleOffsetR[0], "{2}")        
-		; Main.UpdateArmorRightProperties()
-	elseIf (option == optionOffsetRightY)
-		Main.NippleOffsetR[2] = value
-		SetSliderOptionValue(optionOffsetRightY, Main.NippleOffsetR[2], "{2}")        
-	elseIf (option == optionOffsetRightZ)
 		Main.NippleOffsetR[1] = value
-		SetSliderOptionValue(optionOffsetRightZ, Main.NippleOffsetR[1], "{2}")        		
+		SetSliderOptionValue(optionOffsetLeftZ, Main.NippleOffsetL[1], "{2}")        		
+	; elseif (option == optionOffsetRightX)
+	; 	Main.NippleOffsetR[0] = value
+	; 	SetSliderOptionValue(optionOffsetRightX, Main.NippleOffsetR[0], "{2}")        
+	; 	; Main.UpdateArmorRightProperties()
+	; elseIf (option == optionOffsetRightY)
+	; 	Main.NippleOffsetR[2] = value
+	; 	SetSliderOptionValue(optionOffsetRightY, Main.NippleOffsetR[2], "{2}")        
+	; elseIf (option == optionOffsetRightZ)
+	; 	Main.NippleOffsetR[1] = value
+	; 	SetSliderOptionValue(optionOffsetRightZ, Main.NippleOffsetR[1], "{2}")        		
 	elseIf (option == optionGlobalEmitterScale)
 		Main.GlobalEmitterScale = value
 		SetSliderOptionValue(optionGlobalEmitterScale, Main.GlobalEmitterScale, "{2}")        		
@@ -187,9 +190,9 @@ event OnOptionHighlight(int option)
 	if option == optionKeyStartLactating
 		SetInfoText("Key for toggling nipple squirting on/off on the player. Does not work during OStim scenes.")
 	elseIf option == optionOffsetLeftX || option == optionOffsetLeftY || option == optionOffsetLeftZ
-		SetInfoText("Offset for the left nipple squirt emitter origin. Adjust to match the player's body.")
-	elseIf option == optionOffsetRightX || option == optionOffsetRightY || option == optionOffsetRightZ
-		SetInfoText("Offset for the right nipple squirt emitter origin. Adjust to match the player's body.")
+		SetInfoText("Offset for the left nipple squirt emitter origin. Adjust to match the player's body. Note that offset will be used for both breasts, x offset will be adjusted for each side.")
+	; elseIf option == optionOffsetRightX || option == optionOffsetRightY || option == optionOffsetRightZ
+	; 	SetInfoText("Offset for the right nipple squirt emitter origin. Adjust to match the player's body.")
 	elseif option == optionGlobalEmitterScale
 		SetInfoText("Global emitter scale for left and right emitters.")
 	elseif option == optionGlobalEmitterScale
