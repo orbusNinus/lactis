@@ -26,7 +26,6 @@ Bool Property UseRandomEmitterDeactivation Auto
 ; --- Fields (private)
 
 Float fVersion
-Int KeyToggleSwitch = 24 ; Key "O" the letter, not zero, FOR DEBUGGING switch
 
 ; object reference to the left nipple squirt armor
 LactisNippleSquirtArmor playerArmorLeftRef = None 
@@ -66,8 +65,7 @@ Function Maintenance()
 
 	; Other maintenance code that only needs to run once per save load		
 	Console("loaded version is " + fVersion)
-	RegisterForKey(StartLactatingKey) 
-	RegisterForKey(KeyToggleSwitch) ; Key "O" the letter, not zero, FOR DEBUGGING switch
+	RegisterForKey(StartLactatingKey)
 	
 	ostim = game.GetFormFromFile(0x000801, "Ostim.esp") as OsexIntegrationMain
 	if (ostim)
@@ -78,8 +76,7 @@ Function Maintenance()
 		RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
 		RegisterForModEvent("ostim_spank", "OnOstimSpank")			
 		RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
-		RegisterForModEvent("ostim_end", "OnOStimEnd")
-		
+		RegisterForModEvent("ostim_end", "OnOStimEnd")		
 		; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
 	elseif ostim==None
 		Console("OStim not installed.")	
@@ -97,9 +94,9 @@ Event OnKeyDown(Int keyCode)
 
 	Console("**** A registered key has been pressed: "+ keyCode)
 	if (!ostim || (ostim && !ostim.AnimationRunning()))
-		If (keyCode == StartLactatingKey)				
+		If keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
 			ToggleNippleSquirt(PlayerRef)
-		elseif (keyCode == KeyToggleSwitch)		
+		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)		
 			if (playerArmorLeftRef!=None)
 				if (switch==0)
 					playerArmorLeftRef.SetLevel(0)
