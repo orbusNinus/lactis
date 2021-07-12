@@ -53,7 +53,7 @@ EndEvent
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)        
     ; Console("OnContainerChanged: ") 
     If akNewContainer == ActorRef
-        ; Console("OnContainerChanged: new container is ActorRef")        
+        Console("OnContainerChanged: new container is ActorRef=" + ActorRef)
         ; float ftimeStart = Utility.GetCurrentRealTime() 
 
         ; Using "self" instead of "baseObject" does not work, as we will get an 
