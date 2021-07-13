@@ -36,21 +36,18 @@ Bool Property UseRandomEmitterDeactivation Auto
 
 Float fVersion
 
-; object reference to the left nipple squirt armor
-LactisNippleSquirtArmor playerArmorLeftRef = None 
-; object reference to the right nipple squirt armor
-LactisNippleSquirtArmor playerArmorRightRef = None 
+Actor[] armorActors
+LactisNippleSquirtArmor[] armorRefsLeft
+LactisNippleSquirtArmor[] armorRefsRight
 
 ; --- Internal state variables
 
 Int switch = 0
 bool isLeftSquirtOn = false
-bool isRightSquirtOn = false
 
 ; --- OStim integration
 
 OsexIntegrationMain ostim
-; bool isAnyOStimSquirtPlaying = false
 int ostimSpankMax = 10
 float ostimSquirtScaleMin = 0.75
 float ostimSquirtScaleMax = 2.0
@@ -63,8 +60,8 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.24; <--- Edit this value when updating
-		fVersion = 0.24 ; and this
+	If fVersion < 0.25; <--- Edit this value when updating
+		fVersion = 0.25 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -86,7 +83,11 @@ Function Maintenance()
 		; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
 	elseif ostim==None
 		Console("OStim not installed.")	
-	endif
+	endif	
+
+	armorActors = new Actor[50]
+	armorRefsLeft = new LactisNippleSquirtArmor[50]
+	armorRefsRight = new LactisNippleSquirtArmor[50]
 
 	Utility.Wait(0.1)
 EndFunction
@@ -99,22 +100,36 @@ Event OnKeyDown(Int keyCode)
 	EndIf
 
 	Console("**** A registered key has been pressed: "+ keyCode)
+
+	ObjectReference crosshairObjRef = Game.GetCurrentCrosshairRef()
+	Actor crosshairActor = crosshairObjRef as Actor
+
+	Actor affectedActor = PlayerRef
+	if crosshairActor != None
+		affectedActor = crosshairActor
+	endif
+
+	Console("Toggling nipple squirt for actor: " + affectedActor)
+
 	if (!ostim || (ostim && !ostim.AnimationRunning()))
 		If keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
-			ToggleNippleSquirt(PlayerRef)
-		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)		
-			if (playerArmorLeftRef!=None)
-				if (switch==0)
-					playerArmorLeftRef.SetLevel(0)
-					playerArmorRightRef.SetLevel(0)
+			ToggleNippleSquirt(affectedActor)
+		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)					
+			LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
+			LactisNippleSquirtArmor armorLeft = armorRefs[0]
+			LactisNippleSquirtArmor armorRight = armorRefs[1]
+			if armorRefs != None
+				if switch==0
+					armorLeft.SetLevel(0)
+					armorRight.SetLevel(0)
 					switch=1
-				elseif (switch==1)
-					playerArmorLeftRef.SetLevel(1)
-					playerArmorRightRef.SetLevel(1)		
+				elseif switch==1
+					armorLeft.SetLevel(1)
+					armorRight.SetLevel(1)		
 					switch=2
-				elseif (switch==2)
-					playerArmorLeftRef.SetLevel(2)
-					playerArmorRightRef.SetLevel(2)		
+				elseif switch==2
+					armorLeft.SetLevel(2)
+					armorRight.SetLevel(2)		
 					switch=0
 				endif			
 			endif
@@ -150,33 +165,35 @@ EndFunction
 ; ---------------------------- Nipple squirt
 
 Function ToggleNippleSquirt(Actor actorRef)
-	; changing state *before* play/stop effects as these are synchronous by using Wait() which
-	; will mess up *SquirtOn state when we set it after play/stop effects.
-	isLeftSquirtOn = !isLeftSquirtOn
-	isRightSquirtOn = !isRightSquirtOn
+	
+	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)
+	
+	if actorArmors
+		isLeftSquirtOn = false
+	else
+		isLeftSquirtOn = true
+	endif
+
+	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", isLeftSquirtOn=" + isLeftSquirtOn)
 	
 	; How long does our operation take?
 	float ftimeStart = Utility.GetCurrentRealTime()
-	if (isLeftSquirtOn!=true) 
-		; Debug.Notification("Nipple squirt right toggled off") 
-		StopNippleSquirt(actorRef, playerArmorLeftRef, playerArmorRightRef)
-		playerArmorLeftRef = None
-		playerArmorRightRef = None
+	if (isLeftSquirtOn!=true) 		
+		; Console("Stopping nipple squirt. count=" + JArray.count(actorArmors) + ", af=" + af + ", al=" + al)
+		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
+		RemoveArmorRefs(actorRef)
 	Else
 		; Debug.Notification("Nipple squirt left toggled on") 
-		playerArmorLeftRef = StartNippleSquirtLeft(actorRef)		
+		LactisNippleSquirtArmor armorLeft = StartNippleSquirtLeft(actorRef)				
+		LactisNippleSquirtArmor armorRight = StartNippleSquirtRight(actorRef)	
+		; Console("Storing armors. actor=" + actorRef + ", armorLeft=" + armorLeft + ", armorRight=" + armorRight)
+		StoreArmorRefs(actorRef, armorLeft, armorRight)
+		
 		if NippleLeakEnabled		
 			StartNippleLeak(actorRef, 10)
 		endif
 	EndIf
-
-	if (isRightSquirtOn!=true) 
-		playerArmorRightRef = None
-	Else
-		; Debug.Notification("Nipple squirt right toggled on") 
-		playerArmorRightRef = StartNippleSquirtRight(actorRef)					
-	EndIf
-	; Long operation here
+	
 	float ftimeEnd = Utility.GetCurrentRealTime()
 	Console("Starting/stopping took " + (ftimeEnd - ftimeStart) + " seconds to run")
 
@@ -209,7 +226,8 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	return armorRightRef
 EndFunction
 
-Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
+; Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
+Function StopNippleSquirt(Actor actorRef, Form armorLeftRef, Form armorRightRef)
 	Console("StopNippleSquirt")
 
 	if NippleLeakEnabled	
@@ -243,6 +261,48 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleO
 	armorRef.UseRandomEmitterDeactivation = UseRandomEmitterDeactivation
 	armorRef.UpdateNodeProperties()
 EndFunction
+
+; ----------------------------- Armor reference storage utilities
+
+; Stores the left and right armor references for the given actorRef
+int Function StoreArmorRefs(Actor actorRef, LactisNippleSquirtArmor armorRefLeft, LactisNippleSquirtArmor armorRefRight)
+	int firstFreeIndex = armorActors.Find(None)
+	if firstFreeIndex>=0
+		Console("Storing armor refs for actor=" + actorRef + ", armorLeft=" + armorRefLeft + ", armorRight=" + armorRefRight)
+		armorActors[firstFreeIndex] = actorRef
+		armorRefsLeft[firstFreeIndex] = armorRefLeft
+		armorRefsRight[firstFreeIndex] = armorRefRight
+	else
+		Console("ArmorRef storage full!")
+	endif
+	return firstFreeIndex
+EndFunction
+
+; Gets the left and right armor references for the given actorRef or None if the actor has no 
+; nipple squirt armor equipped.
+LactisNippleSquirtArmor[] Function GetArmorRefs(Actor actorRef)
+	int actorIndex = armorActors.Find(actorRef)
+	if actorIndex >= 0
+		LactisNippleSquirtArmor[] armorRefs = new LactisNippleSquirtArmor[2]
+		armorRefs[0] = armorRefsLeft[actorIndex]
+		armorRefs[1] = armorRefsRight[actorIndex]
+		return armorRefs
+	endif
+	; we cannot return None explicitly here as this will result in a runtime cast error
+	; luckily returning nothing seems to actually return None :)
+EndFunction
+
+; Removes the armore references for the given actorRef from the internal storage.
+Function RemoveArmorRefs(Actor actorRef)
+	int actorIndex = armorActors.Find(actorRef)
+	If actorIndex >= 0
+		Console("Removing armor refs for actor=" + actorRef)
+		armorActors[actorIndex] = None
+		armorRefsLeft[actorIndex] = None
+		armorRefsRight[actorIndex] = None
+	EndIf
+EndFunction
+
 
 ; ---------------------------- Utility functions
 
