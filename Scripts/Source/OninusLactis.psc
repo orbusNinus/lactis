@@ -43,12 +43,12 @@ LactisNippleSquirtArmor[] armorRefsRight
 ; --- Internal state variables
 
 Int switch = 0
-bool isLeftSquirtOn = false
 
 ; --- OStim integration
 
 OsexIntegrationMain ostim
 int ostimSpankMax = 10
+int origOstimSpankMax = 0
 float ostimSquirtScaleMin = 0.75
 float ostimSquirtScaleMax = 2.0
 
@@ -109,8 +109,6 @@ Event OnKeyDown(Int keyCode)
 		affectedActor = crosshairActor
 	endif
 
-	Console("Toggling nipple squirt for actor: " + affectedActor)
-
 	if (!ostim || (ostim && !ostim.AnimationRunning()))
 		If keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
 			ToggleNippleSquirt(affectedActor)
@@ -152,13 +150,13 @@ EndFunction
 ; Note that the effect plays on both breats. Playing the leaking effect on 
 ; one side only is not possible.
 Function StartNippleLeak(Actor actorRef, int duration)	
-	Console("StartNippleLeak")
+	Console("StartNippleLeak on actor " + actorRef + " for " + duration + " seconds.")
 	LactisNippleLeakCBBE.play(actorRef, duration)		
 EndFunction
 
 ; Stops the milk leaking effect on both breasts
 Function StopNippleLeak(Actor actorRef)	
-	Console("StopNippleLeak")
+	Console("StopNippleLeak on actor " + actorRef)
 	LactisNippleLeakCBBE.Stop(actorRef)		
 EndFunction
 
@@ -168,34 +166,33 @@ Function ToggleNippleSquirt(Actor actorRef)
 	
 	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)
 	
+	bool isStartingSquirt = false
+
 	if actorArmors
-		isLeftSquirtOn = false
+		isStartingSquirt = false
 	else
-		isLeftSquirtOn = true
+		isStartingSquirt = true
 	endif
 
-	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", isLeftSquirtOn=" + isLeftSquirtOn)
+	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", isStartingSquirt=" + isStartingSquirt)
 	
 	; How long does our operation take?
-	float ftimeStart = Utility.GetCurrentRealTime()
-	if (isLeftSquirtOn!=true) 		
-		; Console("Stopping nipple squirt. count=" + JArray.count(actorArmors) + ", af=" + af + ", al=" + al)
-		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
-		RemoveArmorRefs(actorRef)
-	Else
-		; Debug.Notification("Nipple squirt left toggled on") 
+	; float ftimeStart = Utility.GetCurrentRealTime()
+	if isStartingSquirt
 		LactisNippleSquirtArmor armorLeft = StartNippleSquirtLeft(actorRef)				
 		LactisNippleSquirtArmor armorRight = StartNippleSquirtRight(actorRef)	
 		; Console("Storing armors. actor=" + actorRef + ", armorLeft=" + armorLeft + ", armorRight=" + armorRight)
-		StoreArmorRefs(actorRef, armorLeft, armorRight)
-		
+		StoreArmorRefs(actorRef, armorLeft, armorRight)		
 		if NippleLeakEnabled		
 			StartNippleLeak(actorRef, 10)
 		endif
+	else
+		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
+		RemoveArmorRefs(actorRef)
 	EndIf
 	
-	float ftimeEnd = Utility.GetCurrentRealTime()
-	Console("Starting/stopping took " + (ftimeEnd - ftimeStart) + " seconds to run")
+	; float ftimeEnd = Utility.GetCurrentRealTime()
+	; Console("Starting/stopping took " + (ftimeEnd - ftimeStart) + " seconds to run")
 
 	actorRef.QueueNiNodeUpdate()
 	Utility.Wait(0.1)
@@ -228,7 +225,7 @@ EndFunction
 
 ; Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
 Function StopNippleSquirt(Actor actorRef, Form armorLeftRef, Form armorRightRef)
-	Console("StopNippleSquirt")
+	Console("StopNippleSquirt on actor " + actorRef)
 
 	if NippleLeakEnabled	
 		StopNippleLeak(actorRef)
@@ -268,7 +265,7 @@ EndFunction
 int Function StoreArmorRefs(Actor actorRef, LactisNippleSquirtArmor armorRefLeft, LactisNippleSquirtArmor armorRefRight)
 	int firstFreeIndex = armorActors.Find(None)
 	if firstFreeIndex>=0
-		Console("Storing armor refs for actor=" + actorRef + ", armorLeft=" + armorRefLeft + ", armorRight=" + armorRefRight)
+		; Console("Storing armor refs for actor=" + actorRef + ", armorLeft=" + armorRefLeft + ", armorRight=" + armorRefRight)
 		armorActors[firstFreeIndex] = actorRef
 		armorRefsLeft[firstFreeIndex] = armorRefLeft
 		armorRefsRight[firstFreeIndex] = armorRefRight
@@ -296,7 +293,7 @@ EndFunction
 Function RemoveArmorRefs(Actor actorRef)
 	int actorIndex = armorActors.Find(actorRef)
 	If actorIndex >= 0
-		Console("Removing armor refs for actor=" + actorRef)
+		; Console("Removing armor refs for actor=" + actorRef)
 		armorActors[actorIndex] = None
 		armorRefsLeft[actorIndex] = None
 		armorRefsRight[actorIndex] = None
@@ -463,11 +460,13 @@ EndEvent
 
 Event OnOStimPrestart(string eventName, string strArg, float numArg, Form sender)
 	Console("OnOStimPrestart")
+	origOstimSpankMax = ostim.GetMaxSpanksAllowed()
 	ostim.SetSpankMax(ostimSpankMax)
 endevent
 
 Event OnOStimEnd(string eventName, string strArg, float numArg, Form sender)
 	Console("OnOStimEnd")
+	ostim.SetSpankMax(origOstimSpankMax)
 endevent
 
 ; ; vanilla OSex class library

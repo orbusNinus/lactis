@@ -24,7 +24,7 @@ Event OnInit()
     baseObject = self.GetBaseObject()
     armorAA = (baseObject as Armor).GetNthArmorAddon(0)
     ; OnInit the actorRef will always be the default value set in the CK (set to PlayerRef there)    
-    Console("OnInit: self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef)   
+    ; Console("OnInit: self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef)   
     ; Thus the update here will be wasted when the actor is not the player after container change
     ; Update()
     rot = new Float[3]
@@ -55,7 +55,7 @@ EndEvent
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)        
     ; Console("OnContainerChanged: ") 
     If akNewContainer == ActorRef
-        Console("OnContainerChanged: new container is ActorRef=" + ActorRef)
+        Console("OnContainerChanged: new container is ActorRef=" + ActorRef + ", self=" + self + ", baseObject=" + baseObject)
         ; float ftimeStart = Utility.GetCurrentRealTime() 
 
         ; Using "self" instead of "baseObject" does not work, as we will get an 
