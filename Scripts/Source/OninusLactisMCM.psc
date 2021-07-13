@@ -35,7 +35,7 @@ Event OnPageReset(string page)
     ElseIf Page == ("Settings")		
         SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Keyboard (Manual mode)")        
-        optionKeyStartLactating = AddKeyMapOption("Toggle nipple squirt L&R key", Main.StartLactatingKey)
+        optionKeyStartLactating = AddKeyMapOption("Toggle nipple squirt key", Main.StartLactatingKey)
 		AddHeaderOption("Nipple Offset")
         optionOffsetLeftX = AddSliderOption("Left / Right", Main.NippleOffsetL[0], "{2}")        
         optionOffsetLeftY = AddSliderOption("Up / Down", Main.NippleOffsetL[2], "{2}")
@@ -190,11 +190,9 @@ event OnOptionHighlight(int option)
 	if option == optionKeyStartLactating
 		SetInfoText("Key for toggling nipple squirting on/off on the player. Does not work during OStim scenes.")
 	elseIf option == optionOffsetLeftX || option == optionOffsetLeftY || option == optionOffsetLeftZ
-		SetInfoText("Offset for the left nipple squirt emitter origin. Adjust to match the player's body. Note that offset will be used for both breasts, x offset will be adjusted for each side.")
+		SetInfoText("Offset for the nipple squirt emitter origin. Adjust to match the player's body. Note that offset will be used for both breasts, x offset will be adjusted for each side.")
 	; elseIf option == optionOffsetRightX || option == optionOffsetRightY || option == optionOffsetRightZ
 	; 	SetInfoText("Offset for the right nipple squirt emitter origin. Adjust to match the player's body.")
-	elseif option == optionGlobalEmitterScale
-		SetInfoText("Global emitter scale for left and right emitters.")
 	elseif option == optionGlobalEmitterScale
 		SetInfoText("Global emitter scale for left and right emitters.")
 	elseif option == optionOStimIntegrationEnabled
