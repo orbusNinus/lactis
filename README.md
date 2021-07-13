@@ -18,7 +18,7 @@ Install with your favorite mod manager.
 
 ## Features
 
-+ (Optional) CBBE nipple leak overlay.
++ (Optional) CBBE nipple leak overlay. 
 
 ### Standalone
 + Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.

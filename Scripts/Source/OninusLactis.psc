@@ -147,8 +147,6 @@ EndFunction
 
 ; Plays the nipple leaking effect on both breasts of the given 'ActorRef'.
 ; The 'duration' is in seconds, use -1 to play the effect forever.
-; Note that the effect plays on both breats. Playing the leaking effect on 
-; one side only is not possible.
 Function StartNippleLeak(Actor actorRef, int duration)	
 	Console("StartNippleLeak on actor " + actorRef + " for " + duration + " seconds.")
 	LactisNippleLeakCBBE.play(actorRef, duration)		
