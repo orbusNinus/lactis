@@ -36,9 +36,9 @@ Bool Property UseRandomEmitterDeactivation Auto
 
 Float fVersion
 
-Actor[] armorActors
-LactisNippleSquirtArmor[] armorRefsLeft
-LactisNippleSquirtArmor[] armorRefsRight
+Actor[] Property armorActors Auto
+LactisNippleSquirtArmor[] Property armorRefsLeft Auto
+LactisNippleSquirtArmor[] Property armorRefsRight Auto
 
 ; --- Internal state variables
 
@@ -60,8 +60,8 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.25; <--- Edit this value when updating
-		fVersion = 0.25 ; and this
+	If fVersion < 0.26; <--- Edit this value when updating
+		fVersion = 0.26 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -85,9 +85,9 @@ Function Maintenance()
 		Console("OStim not installed.")	
 	endif	
 
-	armorActors = new Actor[50]
-	armorRefsLeft = new LactisNippleSquirtArmor[50]
-	armorRefsRight = new LactisNippleSquirtArmor[50]
+	; armorActors = new Actor[50]
+	; armorRefsLeft = new LactisNippleSquirtArmor[50]
+	; armorRefsRight = new LactisNippleSquirtArmor[50]
 
 	Utility.Wait(0.1)
 EndFunction
@@ -162,21 +162,17 @@ EndFunction
 
 Function ToggleNippleSquirt(Actor actorRef)
 	
-	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)
-	
-	bool isStartingSquirt = false
-
+	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)	
+	bool hasNippleSquirt = false
 	if actorArmors
-		isStartingSquirt = false
-	else
-		isStartingSquirt = true
+		hasNippleSquirt = true
 	endif
 
-	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", isStartingSquirt=" + isStartingSquirt)
+	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", hasNippleSquirt=" + hasNippleSquirt)
 	
 	; How long does our operation take?
 	; float ftimeStart = Utility.GetCurrentRealTime()
-	if isStartingSquirt
+	if !hasNippleSquirt
 		LactisNippleSquirtArmor armorLeft = StartNippleSquirtLeft(actorRef)				
 		LactisNippleSquirtArmor armorRight = StartNippleSquirtRight(actorRef)	
 		; Console("Storing armors. actor=" + actorRef + ", armorLeft=" + armorLeft + ", armorRight=" + armorRight)
@@ -216,26 +212,40 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	armorRightRef.SetLevel(level, false)
 	actorRef.AddItem(armorRightRef, 1, true)
 	UpdateArmorProperties(armorRightRef, NippleOffsetR)
-	; actorRef.EquipItem(armorRightRef.GetBaseObject(), true, true)
 	actorRef.QueueNiNodeUpdate()
 	return armorRightRef
 EndFunction
 
-; Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
-Function StopNippleSquirt(Actor actorRef, Form armorLeftRef, Form armorRightRef)
-	Console("StopNippleSquirt on actor " + actorRef)
+Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
+	Console("StopNippleSquirt on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
 
 	if NippleLeakEnabled	
 		StopNippleLeak(actorRef)
 	endif
 
-	actorRef.RemoveItem(armorLeftRef, 1, true)
-	actorRef.RemoveItem(armorRightRef, 1, true)
+	actorRef.RemoveItem(LactisNippleSquirtArmorL, 1, true)
+	actorRef.RemoveItem(LactisNippleSquirtArmorR, 1, true)
+	; actorRef.RemoveItem(armorLeftRef, 1, true)
+	; actorRef.RemoveItem(armorRightRef, 1, true)
 	actorRef.QueueNiNodeUpdate()
-	armorLeftRef = None
-	armorRightRef = None
 
 	Utility.Wait(0.1)
+EndFunction
+
+Function StopAllNippleSquirts() 
+	int i = 0	
+	int len = armorActors.Length
+	Actor actorRef = None
+	Console("Stopping all nipple squirts")
+	while i < len
+		actorRef = armorActors[i]
+		if actorRef
+			LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)
+			StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
+			RemoveArmorRefs(actorRef)
+		endif
+		i += 1
+	endwhile
 EndFunction
 
 
@@ -287,7 +297,7 @@ LactisNippleSquirtArmor[] Function GetArmorRefs(Actor actorRef)
 	; luckily returning nothing seems to actually return None :)
 EndFunction
 
-; Removes the armore references for the given actorRef from the internal storage.
+; Removes the armor references for the given actorRef from the internal storage.
 Function RemoveArmorRefs(Actor actorRef)
 	int actorIndex = armorActors.Find(actorRef)
 	If actorIndex >= 0
@@ -298,6 +308,21 @@ Function RemoveArmorRefs(Actor actorRef)
 	EndIf
 EndFunction
 
+; Gets the number of actors with active nipple squirt armor.
+Int Function GetArmoredActorsCount()
+	int i = 0	
+	int len = armorActors.Length
+	int count = 0
+	Actor actorRef = None
+	while i < len
+		actorRef = armorActors[i]
+		if actorRef
+			count += 1
+		endif
+		i += 1
+	endwhile	
+	return count
+EndFunction
 
 ; ---------------------------- Utility functions
 

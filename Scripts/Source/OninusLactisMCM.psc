@@ -20,6 +20,7 @@ Int optionDebugAxisEnabled
 Int optionRandomYRotEnabled
 Int optionRandomEmitterScaleEnabled
 Int optionRandomEmitterDeactivationEnabled
+Int optionResetAll
 
 Event OnInit()
 	Init()
@@ -59,6 +60,9 @@ Event OnPageReset(string page)
 		optionRandomYRotEnabled = AddToggleOption("Enable random Y rotation", Main.UseRandomYRotation)
 		optionRandomEmitterScaleEnabled = AddToggleOption("Enable random emitter scale", Main.UseRandomEmitterScale)
 		optionRandomEmitterDeactivationEnabled = AddToggleOption("Enable random emitter deactivation", Main.UseRandomEmitterDeactivation)
+		SetCursorPosition(1)
+		AddTextOption("Active nipple squirts", Main.GetArmoredActorsCount() )
+		optionResetAll = AddTextOption("Reset all", "Click")
     EndIF
 EndEvent
 
@@ -84,6 +88,8 @@ event OnOptionSelect(int option)
 	elseif (option == optionRandomEmitterDeactivationEnabled)		
 		Main.UseRandomEmitterDeactivation = !Main.UseRandomEmitterDeactivation
 		SetToggleOptionValue(optionRandomEmitterDeactivationEnabled, Main.UseRandomEmitterDeactivation)
+	ElseIf (option == optionResetAll)
+		Main.StopAllNippleSquirts()
 	endIf
 endEvent
 
@@ -140,13 +146,11 @@ event OnOptionSliderAccept(int option, float value)
 	if (option == optionOffsetLeftX)
 		Main.NippleOffsetL[0] = value
 		Main.NippleOffsetR[0] = -value
-		SetSliderOptionValue(optionOffsetLeftX, Main.NippleOffsetL[0], "{2}")        
-		
+		SetSliderOptionValue(optionOffsetLeftX, Main.NippleOffsetL[0], "{2}")
 	elseIf (option == optionOffsetLeftY)
 		Main.NippleOffsetL[2] = value
 		Main.NippleOffsetR[2] = value
-		SetSliderOptionValue(optionOffsetLeftY, Main.NippleOffsetL[2], "{2}")        
-		
+		SetSliderOptionValue(optionOffsetLeftY, Main.NippleOffsetL[2], "{2}")
 	elseIf (option == optionOffsetLeftZ)
 		Main.NippleOffsetL[1] = value
 		Main.NippleOffsetR[1] = value
@@ -209,6 +213,8 @@ event OnOptionHighlight(int option)
 		SetInfoText("Enables a debug axis for nipple offset adjustments.")
 	elseif option == optionRandomYRotEnabled || option == optionRandomEmitterScaleEnabled || option == optionRandomEmitterDeactivationEnabled
 		SetInfoText("Experimental feature which may result in unpredictable behaviour. Dont't use it.")
+	elseif option == optionResetAll
+		SetInfoText("Removes nipple squirt effect from all actors.")
 	else 
 		SetInfoText("")
 	endIf
