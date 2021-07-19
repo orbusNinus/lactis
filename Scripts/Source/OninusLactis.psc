@@ -80,7 +80,7 @@ Function Maintenance()
 		RegisterForModEvent("ostim_spank", "OnOstimSpank")			
 		RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
 		RegisterForModEvent("ostim_end", "OnOStimEnd")		
-		; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
+		RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
 	elseif ostim==None
 		Console("OStim not installed.")	
 	endif	
@@ -136,7 +136,7 @@ Event OnKeyDown(Int keyCode)
 
 EndEvent
 
-; Used by the MCM script. When querying OStim during gameplay the ostim varibale
+; Used by the MCM script. When querying OStim during gameplay the ostim variable
 ; should be checked directly for performance reasons.
 Bool Function HasOStim() 	
 	return ostim!=None
@@ -233,6 +233,10 @@ Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, 
 EndFunction
 
 Function StopAllNippleSquirts() 
+	if ostim && ostim.AnimationRunning()
+		return
+	endif
+
 	int i = 0	
 	int len = armorActors.Length
 	Actor actorRef = None
@@ -425,7 +429,6 @@ Function PlaySpankSquirt(Actor actorRef)
 	; on a female player with the SOS Futanari schlong attached IsFemale==false and the spank squirt will not be played
 	; thus we use AppearsFemale().. 
 	; TODO: i guess this could be cached at OnOstimPrestart
-	; if (!ostim.IsNaked(subActor) || !ostim.AppearsFemale(subActor)) 
 	if !ostim.AppearsFemale(actorRef) || (!ostim.IsNaked(actorRef) && !OStimNonNakedSquirtEnabled)
 		Console("PlaySpankSquirt: Spank squirt cancelled. actor=" + actorRef + "actorRef.IsEquipped(LactisNippleSquirtArmorL)=" + actorRef.IsEquipped(LactisNippleSquirtArmorL) + ", ostim.IsNaked(subActor)=" + ostim.IsNaked(actorRef) + ", ostim.IsFemale(subActor)=" + ostim.IsFemale(actorRef) + ", AppearsFemale=" + ostim.AppearsFemale(actorRef))
 		return
@@ -459,24 +462,36 @@ EndFunction
 Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, Form sender)
 	Console("OnOstimAnimationChanged: eventName=" + eventName + ", strArg=" + strArg + ", numArg="+ numArg)
 
-	Actor subActor = ostim.GetSubActor()
+	Actor actorRef = ostim.GetSubActor()
 
-	if subActor.IsEquipped(LactisNippleSquirtArmorL)
+	if actorRef.IsEquipped(LactisNippleSquirtArmorL)
+		return
+	endif
+
+	if !ostim.AppearsFemale(actorRef) || (!ostim.IsNaked(actorRef) && !OStimNonNakedSquirtEnabled)
+		Console("OnOstimAnimationChanged: Animation nipple squirt cancelled. actor=" + actorRef + "actorRef.IsEquipped(LactisNippleSquirtArmorL)=" + actorRef.IsEquipped(LactisNippleSquirtArmorL) + ", ostim.IsNaked(actorRef)=" + ostim.IsNaked(actorRef) + ", ostim.IsFemale(actorRef)=" + ostim.IsFemale(actorRef) + ", AppearsFemale=" + ostim.AppearsFemale(actorRef))
 		return
 	endif
 
 	String currentAnimClass = ostim.GetCurrentAnimationClass()
 	Console("OnOstimSpank: currentAnimClass=" + currentAnimClass)
 	if (currentAnimClass=="Pf2" || currentAnimClass=="VJ" || currentAnimClass=="Cr" || currentAnimClass=="Po") 		
-		LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(subActor, 1)
-		LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(subActor, 1)
+		LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(actorRef, 1)
+		LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(actorRef, 1)
 		if NippleLeakEnabled
-			StartNippleLeak(subActor, 4)
+			StartNippleLeak(actorRef, 4)
 		endif
+		actorRef.QueueNiNodeUpdate()
+		
 		Utility.Wait(OStimSpankSquirtDuration)
-		StopNippleSquirt(subActor, armorLeftRef, armorRightRef)		
+
+		StopNippleSquirt(actorRef, armorLeftRef, armorRightRef)		
 		armorLeftRef = None
 		armorRightRef = None	
+	endif
+
+	if ostim.IsInFreeCam()
+		actorRef.QueueNiNodeUpdate()
 	endif
 
 EndEvent
