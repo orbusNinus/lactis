@@ -72,6 +72,6 @@ Works best with CBPC. With SMP nipple offset is somewhat off/delayed.
 This mod was developed using the 3BA body and XPMSSE. The nipple squirt effect is attached to the bones named "L Breast03" and "R Breast03". I'm not quite sure where these bones come from (I assume XPMSSE) but they need to be present in the skeleton for the effect to be working correctly.
 
 ## Known issues
-+ Does not work correctly in 1st person mode.
++ Not tested in 1st person mode. Might work, might be not.
 + Particles look weird from some angles.
 + When using SMP nipple offset is somehow delayed (CBPC works better)
