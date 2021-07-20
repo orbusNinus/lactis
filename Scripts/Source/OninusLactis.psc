@@ -60,8 +60,8 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.27; <--- Edit this value when updating
-		fVersion = 0.27 ; and this
+	If fVersion < 0.3; <--- Edit this value when updating
+		fVersion = 0.3 ; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
