@@ -184,6 +184,8 @@ Function ToggleNippleSquirt(Actor actorRef)
 		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
 		RemoveArmorRefs(actorRef)
 	EndIf
+
+	actorArmors = None
 	
 	; float ftimeEnd = Utility.GetCurrentRealTime()
 	; Console("Starting/stopping took " + (ftimeEnd - ftimeStart) + " seconds to run")
@@ -221,12 +223,15 @@ Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, 
 
 	if NippleLeakEnabled	
 		StopNippleLeak(actorRef)
-	endif
+	endif	
 
-	actorRef.RemoveItem(LactisNippleSquirtArmorL, 1, true)
-	actorRef.RemoveItem(LactisNippleSquirtArmorR, 1, true)
-	; actorRef.RemoveItem(armorLeftRef, 1, true)
-	; actorRef.RemoveItem(armorRightRef, 1, true)
+	if armorLeftRef!=None
+		actorRef.RemoveItem(armorLeftRef, 1, true)
+		actorRef.RemoveItem(armorRightRef, 1, true)
+	else
+		actorRef.RemoveItem(LactisNippleSquirtArmorL, 1, true)
+		actorRef.RemoveItem(LactisNippleSquirtArmorR, 1, true)
+	endif
 	actorRef.QueueNiNodeUpdate()
 
 	Utility.Wait(0.1)
