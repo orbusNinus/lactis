@@ -36,7 +36,7 @@ Install with your favorite mod manager.
 Use MCM to configure the left and right nipple offset. You can enable a debug axis to make this step easier.
 Use other parameters to adjust effect if desired.
 
-The standalone nipple squirt effect can be toggled on/off via the key "K" (can be configured via MCM). This works for up to 49 NPCS and the player actor. The effect can be toggled on/off at any time even when your character or the NPC is not naked.
+The standalone nipple squirt effect can be toggled on/off via the key "K" (can be configured via MCM). This works for up to 10 NPCS and the player actor. The effect can be toggled on/off at any time even when your character or the NPC is not naked.
 
 ### Toggle nipple squirt key
 Key for toggling nipple squirting on/off on the player. Does not work during OStim scenes.
