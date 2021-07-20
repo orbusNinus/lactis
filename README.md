@@ -22,7 +22,7 @@ Install with your favorite mod manager.
 
 ### Standalone
 + Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.
-+ Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 50 NPCs (including the player).
++ Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 10 NPCs (including the player).
 + Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair).
 
 ### OStim integration
