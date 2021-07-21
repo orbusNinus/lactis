@@ -66,12 +66,16 @@ Enables a debug axis for nipple offset adjustments.
 Global emitter scale for left and right emitters.
 
 ## Physics
-Works best with CBPC. With SMP nipple offset is somewhat off/delayed.
+Developed and works best with CBPC. With SMP nipple offset is somewhat off/delayed.
+Currently you can only configure one nipple offset which will be used for the player and all NPCs (which will result in incorrect placement when NPCs dont use the player body). Even worse, one would need separate nipple offsets for CBPC and SMP. This is not implemented. 
+TLDR; 
+Use CBPC when using this mod for OStim scenes.
 
 ## Technical details
 This mod was developed using the 3BA body and XPMSSE. The nipple squirt effect is attached to the bones named "L Breast03" and "R Breast03". I'm not quite sure where these bones come from (I assume XPMSSE) but they need to be present in the skeleton for the effect to be working correctly.
 
 ## Known issues
-+ Not tested in 1st person mode. Might work, might be not.
 + Particles look weird from some angles.
 + When using SMP nipple offset is somehow delayed (CBPC works better)
++ During OStim scenes: Flickering face effects when using face lights. Affects player and NPCs.
++ Not tested in 1st person mode. Might work, might be not.
