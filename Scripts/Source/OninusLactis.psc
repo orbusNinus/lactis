@@ -53,15 +53,14 @@ float ostimSquirtScaleMin = 0.75
 float ostimSquirtScaleMax = 2.0
 
 Event OnInit()
-	Debug.Notification("OninusLactis installed.")	
-	; RegisterForSingleUpdate(10.0) ; Give us a single update in one second
+	Debug.Notification("OninusLactis installed.")
 	Maintenance()
 EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.3; <--- Edit this value when updating
-		fVersion = 0.3 ; and this
+	If fVersion < 0.31; <--- Edit this value when updating
+		fVersion = 0.31; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -75,19 +74,15 @@ Function Maintenance()
 		Console("OStim " + ostim.GetAPIVersion() + " installed.")
 	endif
 	If (ostim && OStimIntegrationEnabled)
-		Console("OStim integration enabled.")
+		Console("OStim " + ostim.GetAPIVersion() + " installed. Integration enabled.")
 		RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
 		RegisterForModEvent("ostim_spank", "OnOstimSpank")			
 		RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
 		RegisterForModEvent("ostim_end", "OnOStimEnd")		
-		RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
+		; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
 	elseif ostim==None
 		Console("OStim not installed.")	
 	endif	
-
-	; armorActors = new Actor[50]
-	; armorRefsLeft = new LactisNippleSquirtArmor[50]
-	; armorRefsRight = new LactisNippleSquirtArmor[50]
 
 	Utility.Wait(0.1)
 EndFunction
@@ -99,7 +94,7 @@ Event OnKeyDown(Int keyCode)
 		Return
 	EndIf
 
-	Console("**** A registered key has been pressed: "+ keyCode)
+	; Console("**** A registered key has been pressed: "+ keyCode)
 
 	ObjectReference crosshairObjRef = Game.GetCurrentCrosshairRef()
 	Actor crosshairActor = crosshairObjRef as Actor

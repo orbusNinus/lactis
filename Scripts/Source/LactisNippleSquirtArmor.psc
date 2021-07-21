@@ -80,8 +80,7 @@ EndEvent
 
 Function Update()
     ; Console("Update")
-    ; RegisterForSingleUpdate(3.0)
-    
+        
     if (UseRandomYRotation == true)
         ; Console("OnUpdate: UseRandomYRotation=" + UseRandomYRotation)
         NetImmerse.GetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
@@ -90,10 +89,6 @@ Function Update()
     Else
         ; NetImmerse.SetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
     EndIf
-    
-    ; Global emitter scale    
-    ; Console("Applying globalEmitterScale " + GlobalEmitterScale + " to " + LactisGroupName + " node.")
-    ; NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale, false)
 
     if (UseRandomEmitterScale)
         ; Console("OnUpdate: UseRandomEmitterScale=" + UseRandomEmitterScale)
