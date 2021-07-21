@@ -1,5 +1,5 @@
 # Lactis
-Simple lactating/nipple squirt mod with optional OStim integration.
+Simple lactating/nipple squirt mod with OStim integration. This is a visual effect and no milk economy style mod.
 
 ## Requirements
 + Skyrim: Special Edition (1.5.39+)
@@ -23,10 +23,10 @@ Install with your favorite mod manager.
 ### Standalone
 + Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.
 + Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 10 NPCs (including the player).
-+ Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair).
++ Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair). Nipple squirt for the actor must already be toggled on.
 
 ### OStim integration
-+ If OStim is installed and integration is enabled in MCM, naked female actors will nipple squirt when spanked or on orgasm.
++ If OStim is installed and integration is enabled in MCM, naked female appearing actors will nipple squirt when spanked or on orgasm.
 + Nipple squirt scale can be increased by spanking. Currently the scale applies to all actors as I have not found a way to determine which actor got spanked.
 + Nipple squirt duration can be configured via MCM for spank and orgasm squirt separately.
 + The "K" key is disabled during OStim scenes (might be changed in the future to have more control)
