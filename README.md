@@ -51,7 +51,7 @@ The left/right armor use the **body slots 58/59**.
 + When using SMP nipple offset is somehow delayed (CBPC works better)
 + During OStim scenes: Flickering face effects when using face lights. Affects player and NPCs.
 + Not tested in 1st person mode. Might work, might be not.
-+ It also might happen that you will not be able to stop the nipple squirt of an NPC by using the toggle key. As a last resort you can try to **Right Shift + Toggle Key"** on the NPC. This should remove the effect but can lead to save game bloat.
++ It also might happen that you will not be able to stop the nipple squirt of an NPC by using the toggle key. As a last resort you can try to **Right Shift + Toggle Key"** on the NPC. This should remove the effect but can lead to save game bloat. (feature will be available in >v0.31)
 
 ## MCM configuration
 Use MCM to configure the left and right nipple offset. You can enable a debug axis to make this step easier.
