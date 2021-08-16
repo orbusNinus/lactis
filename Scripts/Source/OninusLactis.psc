@@ -59,8 +59,8 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.31; <--- Edit this value when updating
-		fVersion = 0.31; and this
+	If fVersion < 0.32; <--- Edit this value when updating
+		fVersion = 0.32; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -104,8 +104,12 @@ Event OnKeyDown(Int keyCode)
 		affectedActor = crosshairActor
 	endif
 
+	; keycode 42 = left shift
+	; keycode 54 = right shift
 	if (!ostim || (ostim && !ostim.AnimationRunning()))
-		If keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
+		if keyCode == StartLactatingKey && Input.IsKeyPressed(54)
+			ForceStopNippleSquirt(affectedActor)
+		elseif keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
 			ToggleNippleSquirt(affectedActor)
 		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)					
 			LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
@@ -157,13 +161,9 @@ EndFunction
 
 Function ToggleNippleSquirt(Actor actorRef)
 	
-	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)	
-	bool hasNippleSquirt = false
-	if actorArmors
-		hasNippleSquirt = true
-	endif
-
-	Console("ToggleNippleSquirt, actor=" + actorRef + ", actorArmors=" + actorArmors + ", hasNippleSquirt=" + hasNippleSquirt)
+	bool hasNippleSquirt = HasArmorRefs(actorRef)
+	
+	Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
 	
 	; How long does our operation take?
 	; float ftimeStart = Utility.GetCurrentRealTime()
@@ -176,12 +176,11 @@ Function ToggleNippleSquirt(Actor actorRef)
 			StartNippleLeak(actorRef, 10)
 		endif
 	else
+		LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)			
 		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
 		RemoveArmorRefs(actorRef)
 	EndIf
 
-	actorArmors = None
-	
 	; float ftimeEnd = Utility.GetCurrentRealTime()
 	; Console("Starting/stopping took " + (ftimeEnd - ftimeStart) + " seconds to run")
 
@@ -193,7 +192,7 @@ EndFunction
 
 LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level=0)
 	; Console("StartNippleSquirtLeft")	
-	LactisNippleSquirtArmor armorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1) as LactisNippleSquirtArmor	
+	LactisNippleSquirtArmor armorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1, true) as LactisNippleSquirtArmor	
 	armorLeftRef.ActorRef = actorRef
 	armorLeftRef.SetLevel(level, false)
 	actorRef.AddItem(armorLeftRef, 1, true)
@@ -204,7 +203,7 @@ EndFunction
 
 LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int level=0)
 	; Console("StartNippleSquirtRight")	
-	LactisNippleSquirtArmor armorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1) as LactisNippleSquirtArmor
+	LactisNippleSquirtArmor armorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1, true) as LactisNippleSquirtArmor
 	armorRightRef.ActorRef = actorRef
 	armorRightRef.SetLevel(level, false)
 	actorRef.AddItem(armorRightRef, 1, true)
@@ -229,6 +228,13 @@ Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, 
 	endif
 	actorRef.QueueNiNodeUpdate()
 
+	Utility.Wait(0.1)
+EndFunction
+
+Function ForceStopNippleSquirt(Actor actorRef)
+	actorRef.RemoveItem(LactisNippleSquirtArmorL)
+	actorRef.RemoveItem(LactisNippleSquirtArmorR)
+	actorRef.QueueNiNodeUpdate()
 	Utility.Wait(0.1)
 EndFunction
 
@@ -273,6 +279,15 @@ EndFunction
 
 ; ----------------------------- Armor reference storage utilities
 
+bool Function HasArmorRefs(Actor actorRef)
+	int actorIndex = armorActors.Find(actorRef)
+	if actorIndex >= 0
+		return true
+	Else
+		return false
+	endif
+EndFunction
+
 ; Stores the left and right armor references for the given actorRef
 int Function StoreArmorRefs(Actor actorRef, LactisNippleSquirtArmor armorRefLeft, LactisNippleSquirtArmor armorRefRight)
 	int firstFreeIndex = armorActors.Find(None)
@@ -299,6 +314,7 @@ LactisNippleSquirtArmor[] Function GetArmorRefs(Actor actorRef)
 	endif
 	; we cannot return None explicitly here as this will result in a runtime cast error
 	; luckily returning nothing seems to actually return None :)
+	return None
 EndFunction
 
 ; Removes the armor references for the given actorRef from the internal storage.
@@ -417,8 +433,6 @@ Event OnOstimSpank(string eventName, string strArg, float numArg, Form sender)
 EndEvent
 
 Function PlaySpankSquirt(Actor actorRef)
-	; Actor subActor = ostim.GetSubActor()
-
 	; check the lock to prevent playing another spank squirt while one is running
 	; actually this is the same lock used in PlayOrgasmSquirt() so there should be 
 	; exactly one squirt at any time, no matter if caused by spank or orgasm
