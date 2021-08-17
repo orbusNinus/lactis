@@ -1,5 +1,5 @@
 # Lactis
-Simple lactating/nipple squirt mod with OStim integration. This is a visual effect and no milk economy style mod.
+A simple lactating/nipple squirt mod for OStim. This is a visual effect and no milk economy style mod.
 
 ## Requirements
 + Skyrim: Special Edition (1.5.39+)
