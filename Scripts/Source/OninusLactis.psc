@@ -59,8 +59,8 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.32; <--- Edit this value when updating
-		fVersion = 0.32; and this
+	If fVersion < 0.4; <--- Edit this value when updating
+		fVersion = 0.4; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf
@@ -71,7 +71,7 @@ Function Maintenance()
 	
 	ostim = game.GetFormFromFile(0x000801, "Ostim.esp") as OsexIntegrationMain
 	if (ostim)
-		Console("OStim " + ostim.GetAPIVersion() + " installed.")
+		; Console("OStim " + ostim.GetAPIVersion() + " installed.")
 	endif
 	If (ostim && OStimIntegrationEnabled)
 		Console("OStim " + ostim.GetAPIVersion() + " installed. Integration enabled.")
@@ -163,7 +163,7 @@ Function ToggleNippleSquirt(Actor actorRef)
 	
 	bool hasNippleSquirt = HasArmorRefs(actorRef)
 	
-	Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
+	; Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
 	
 	; How long does our operation take?
 	; float ftimeStart = Utility.GetCurrentRealTime()
@@ -213,7 +213,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 EndFunction
 
 Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
-	Console("StopNippleSquirt on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
+	; Console("StopNippleSquirt on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
 
 	if NippleLeakEnabled	
 		StopNippleLeak(actorRef)
@@ -297,7 +297,7 @@ int Function StoreArmorRefs(Actor actorRef, LactisNippleSquirtArmor armorRefLeft
 		armorRefsLeft[firstFreeIndex] = armorRefLeft
 		armorRefsRight[firstFreeIndex] = armorRefRight
 	else
-		Console("ArmorRef storage full!")
+		Console("Nipple squirt ArmorRef storage full!")
 	endif
 	return firstFreeIndex
 EndFunction
@@ -347,7 +347,7 @@ EndFunction
 ; ---------------------------- Utility functions
 
 Function RemapStartLactatingKey(Int zKey)
-	Console("Remapping StartLactatingKey to "+ zKey)	
+	Console("Remapping ToggleNippleSquirt to "+ zKey)	
 	UnregisterForKey(StartLactatingKey)
 	RegisterForKey(zKey)
 	StartLactatingKey = zKey	
@@ -387,10 +387,7 @@ Event OnOStimOrgasm(string eventName, string strArg, float numArg, Form sender)
 	PlayOrgasmSquirt(orgasmActor)
 EndEvent
 
-Function PlayOrgasmSquirt(Actor actorRef)
-	; Actor orgasmActor = ostim.GetMostRecentOrgasmedActor()
-	Console("PlayOrgasmSquirt: Most recent orgasmed actor is " + actorRef)
-
+Function PlayOrgasmSquirt(Actor actorRef)		
 	; check the lock to prevent playing another orgasm squirt while one is running
 	; actually this is the same lock used in PlaySpankSquirt() so there should be 
 	; exactly one squirt at any time, no matter if caused by spank or orgasm
@@ -412,7 +409,7 @@ Function PlayOrgasmSquirt(Actor actorRef)
 	actorRef.QueueNiNodeUpdate()
 	Utility.Wait(OStimOrgasmSquirtDuration)
 
-	Console("Stopping left and right nipple squirt")
+	; Console("Stopping left and right nipple squirt")
 	StopNippleSquirt(actorRef, armorLeftRef, armorRightRef)
 
 	armorLeftRef = None
@@ -474,7 +471,7 @@ EndFunction
 
 
 Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, Form sender)
-	Console("OnOstimAnimationChanged: eventName=" + eventName + ", strArg=" + strArg + ", numArg="+ numArg)
+	; Console("OnOstimAnimationChanged: eventName=" + eventName + ", strArg=" + strArg + ", numArg="+ numArg)
 
 	Actor actorRef = ostim.GetSubActor()
 
@@ -488,7 +485,7 @@ Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, For
 	endif
 
 	String currentAnimClass = ostim.GetCurrentAnimationClass()
-	Console("OnOstimSpank: currentAnimClass=" + currentAnimClass)
+	; Console("OnOstimSpank: currentAnimClass=" + currentAnimClass)
 	if (currentAnimClass=="Pf2" || currentAnimClass=="VJ" || currentAnimClass=="Cr" || currentAnimClass=="Po") 		
 		LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(actorRef, 1)
 		LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(actorRef, 1)
@@ -511,13 +508,13 @@ Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, For
 EndEvent
 
 Event OnOStimPrestart(string eventName, string strArg, float numArg, Form sender)
-	Console("OnOStimPrestart")
+	; Console("OnOStimPrestart")
 	origOstimSpankMax = ostim.GetMaxSpanksAllowed()
 	ostim.SetSpankMax(ostimSpankMax)
 endevent
 
 Event OnOStimEnd(string eventName, string strArg, float numArg, Form sender)
-	Console("OnOStimEnd")
+	; Console("OnOStimEnd")
 	ostim.SetSpankMax(origOstimSpankMax)
 endevent
 

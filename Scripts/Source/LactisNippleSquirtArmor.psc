@@ -53,9 +53,9 @@ EndEvent
 ; EndEvent
 
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)        
-    ; Console("OnContainerChanged: ") 
+    
     If akNewContainer == ActorRef
-        Console("OnContainerChanged: new container is ActorRef=" + ActorRef + ", self=" + self + ", baseObject=" + baseObject)
+        ; Console("OnContainerChanged: new container is ActorRef=" + ActorRef + ", self=" + self + ", baseObject=" + baseObject)
         ; float ftimeStart = Utility.GetCurrentRealTime() 
 
         ; Using "self" instead of "baseObject" does not work, as we will get an 
@@ -73,7 +73,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
         ActorRef.QueueNiNodeUpdate()        
         Utility.Wait(0.05)
     Else
-        Console("OnContainerChanged: new container is " + akNewContainer)       
+        ; Console("OnContainerChanged: new container is " + akNewContainer)       
         ; armor was unequipped (isnt acually called?!)
     EndIf
 EndEvent
