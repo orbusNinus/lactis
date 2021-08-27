@@ -6,6 +6,17 @@
 ; 			███████╗██║  ██║╚██████╗   ██║   ██║███████║
 ; 			╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝╚══════╝
 ;								
+; If you are a mod developer and want to integrate the nipple squirt effect 
+; into your own mod, use the following public API. See the indiviudal functions
+; for documentation.
+;
+; Public API
+; ---
+;
+; + StartNippleSquirt(Actor actorRef, int level=0)
+; + StopNippleSquirt(Actor actorRef) 
+; + ToggleNippleSquirt(Actor actorRef, int level)
+;
 
 ScriptName OninusLactis extends Quest
 
@@ -21,6 +32,7 @@ EffectShader property LactisNippleLeakCBBE auto
 Int Property StartLactatingKey Auto
 Float[] Property NippleOffsetL Auto
 Float[] Property NippleOffsetR Auto
+Float Property EmitterScale Auto
 Float Property GlobalEmitterScale Auto
 Bool Property OStimIntegrationEnabled Auto
 Float Property OStimSpankSquirtDuration Auto
@@ -44,6 +56,10 @@ LactisNippleSquirtArmor[] Property armorRefsRight Auto
 
 Int switch = 0
 
+; --- Actor offsets storage
+
+LactisActorStorage Property actorStorage Auto
+
 ; --- OStim integration
 
 OsexIntegrationMain ostim
@@ -59,11 +75,13 @@ EndEvent
 
 
 Function Maintenance()
-	If fVersion < 0.4; <--- Edit this value when updating
-		fVersion = 0.4; and this
+	If fVersion < 0.5; <--- Edit this value when updating
+		fVersion = 0.5; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
-	EndIf
+	EndIf	
+	actorStorage = (self as Form) as LactisActorStorage
+	; Console("actorStorage: " + actorStorage)
 
 	; Other maintenance code that only needs to run once per save load		
 	Console("loaded version is " + fVersion)
@@ -115,21 +133,13 @@ Event OnKeyDown(Int keyCode)
 			LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
 			LactisNippleSquirtArmor armorLeft = armorRefs[0]
 			LactisNippleSquirtArmor armorRight = armorRefs[1]
-			if armorRefs != None
-				if switch==0
-					armorLeft.SetLevel(0)
-					armorRight.SetLevel(0)
-					switch=1
-				elseif switch==1
-					armorLeft.SetLevel(1)
-					armorRight.SetLevel(1)		
-					switch=2
-				elseif switch==2
-					armorLeft.SetLevel(2)
-					armorRight.SetLevel(2)		
-					switch=0
-				endif			
+			int currentLevel = armorLeft.GetLevel()
+			currentLevel = currentLevel + 1
+			if currentLevel > 2
+				currentLevel = 0
 			endif
+			armorLeft.SetLevel(currentLevel)
+			armorRight.SetLevel(currentLevel)
 		EndIf
 	endif
 
@@ -142,43 +152,61 @@ Bool Function HasOStim()
 EndFunction
 
 
-; ----------------------------- Nipple leak
+; --- Nipple squirt public API
 
-; Plays the nipple leaking effect on both breasts of the given 'ActorRef'.
-; The 'duration' is in seconds, use -1 to play the effect forever.
-Function StartNippleLeak(Actor actorRef, int duration)	
-	Console("StartNippleLeak on actor " + actorRef + " for " + duration + " seconds.")
-	LactisNippleLeakCBBE.play(actorRef, duration)		
+; Start the nipple squirt effect on the given 'actorRef' using the given squirt 'level' in the range [0..2].
+; If there are already 10 actors with an active effect the call will be ignored.
+; If the given 'actorRef' already has the nipple squirt effect running the call will be ignored.
+; If the "Nipple Leak" feature is enabled in the MCM this function will also start the nipple leak overlay.
+Function StartNippleSquirt(Actor actorRef, int level=0)
+	if GetArmoredActorsCount() >= 10
+		return
+	endif
+
+	if HasArmorRefs(actorRef)
+		return
+	endif
+
+	LactisNippleSquirtArmor armorLeft = StartNippleSquirtLeft(actorRef, level)
+	LactisNippleSquirtArmor armorRight = StartNippleSquirtRight(actorRef, level)	
+	StoreArmorRefs(actorRef, armorLeft, armorRight)
+
+	if NippleLeakEnabled
+		StartNippleLeak(actorRef, 10)
+	endif
+
+	Utility.Wait(0.1)
 EndFunction
 
-; Stops the milk leaking effect on both breasts
-Function StopNippleLeak(Actor actorRef)	
-	Console("StopNippleLeak on actor " + actorRef)
-	LactisNippleLeakCBBE.Stop(actorRef)		
+; Stops the nipple squirt effect on the given 'actorRef'.
+; If the actor does not have an nipple squirt effect running the call will be ignored.
+; If the "Nipple Leak" feature is enabled in the MCM this function will also stop the nipple leak overlay.
+Function StopNippleSquirt(Actor actorRef)
+	if !HasArmorRefs(actorRef)
+		return
+	endif
+
+	if NippleLeakEnabled	
+		StopNippleLeak(actorRef)
+	endif	
+
+	LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)			
+	StopNippleSquirtInternal(actorRef, actorArmors[0], actorArmors[1])
+	RemoveArmorRefs(actorRef)
+	
+	Utility.Wait(0.1)
 EndFunction
 
-; ---------------------------- Nipple squirt
-
-Function ToggleNippleSquirt(Actor actorRef)
-	
-	bool hasNippleSquirt = HasArmorRefs(actorRef)
-	
+Function ToggleNippleSquirt(Actor actorRef, int level=0)
+	bool hasNippleSquirt = HasArmorRefs(actorRef)	
 	; Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
 	
 	; How long does our operation take?
 	; float ftimeStart = Utility.GetCurrentRealTime()
 	if !hasNippleSquirt
-		LactisNippleSquirtArmor armorLeft = StartNippleSquirtLeft(actorRef)				
-		LactisNippleSquirtArmor armorRight = StartNippleSquirtRight(actorRef)	
-		; Console("Storing armors. actor=" + actorRef + ", armorLeft=" + armorLeft + ", armorRight=" + armorRight)
-		StoreArmorRefs(actorRef, armorLeft, armorRight)		
-		if NippleLeakEnabled		
-			StartNippleLeak(actorRef, 10)
-		endif
+		StartNippleSquirt(actorRef, level)
 	else
-		LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)			
-		StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
-		RemoveArmorRefs(actorRef)
+		StopNippleSquirt(actorRef)
 	EndIf
 
 	; float ftimeEnd = Utility.GetCurrentRealTime()
@@ -189,6 +217,13 @@ Function ToggleNippleSquirt(Actor actorRef)
 	actorRef.QueueNiNodeUpdate()
 EndFunction
 
+Function PlayNippleSquirt(Actor actorRef, float duration, int level=0)
+	StartNippleSquirt(actorRef, level)
+	Utility.Wait(duration)
+	StopNippleSquirt(actorRef)
+EndFunction
+
+; --- Nipple squirt private / internal functions
 
 LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level=0)
 	; Console("StartNippleSquirtLeft")	
@@ -196,7 +231,13 @@ LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level
 	armorLeftRef.ActorRef = actorRef
 	armorLeftRef.SetLevel(level, false)
 	actorRef.AddItem(armorLeftRef, 1, true)
-	UpdateArmorProperties(armorLeftRef, NippleOffsetL)
+	if actorStorage.HasNpcStorage(actorRef)
+		; update npc armors
+		UpdateArmorProperties(armorLeftRef, actorStorage.GetNpcOffset(actorRef), actorStorage.GetNpcScale(actorRef))
+	else
+		; update the player's armor
+		UpdateArmorProperties(armorLeftRef, NippleOffsetL, EmitterScale)
+	endif
 	actorRef.QueueNiNodeUpdate()
 	return armorLeftRef
 EndFunction
@@ -207,18 +248,23 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	armorRightRef.ActorRef = actorRef
 	armorRightRef.SetLevel(level, false)
 	actorRef.AddItem(armorRightRef, 1, true)
-	UpdateArmorProperties(armorRightRef, NippleOffsetR)
+	if actorStorage.HasNpcStorage(actorRef)
+		; update npc armors
+		float[] offset = actorStorage.GetNpcOffset(actorRef)
+		float actorEmitterScale = actorStorage.GetNpcScale(actorRef)
+		offset[0] = -offset[0]
+		UpdateArmorProperties(armorRightRef, offset, actorEmitterScale)
+	else
+		; update the player's armor
+		UpdateArmorProperties(armorRightRef, NippleOffsetR, EmitterScale)
+	endif
 	actorRef.QueueNiNodeUpdate()
 	return armorRightRef
 EndFunction
 
-Function StopNippleSquirt(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
-	; Console("StopNippleSquirt on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
 
-	if NippleLeakEnabled	
-		StopNippleLeak(actorRef)
-	endif	
-
+Function StopNippleSquirtInternal(Actor actorRef, LactisNippleSquirtArmor armorLeftRef, LactisNippleSquirtArmor armorRightRef)
+	; Console("StopNippleSquirtInternal on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
 	if armorLeftRef!=None
 		actorRef.RemoveItem(armorLeftRef, 1, true)
 		actorRef.RemoveItem(armorRightRef, 1, true)
@@ -234,6 +280,9 @@ EndFunction
 Function ForceStopNippleSquirt(Actor actorRef)
 	actorRef.RemoveItem(LactisNippleSquirtArmorL)
 	actorRef.RemoveItem(LactisNippleSquirtArmorR)
+	if HasArmorRefs(actorRef)
+		RemoveArmorRefs(actorRef)
+	endIf
 	actorRef.QueueNiNodeUpdate()
 	Utility.Wait(0.1)
 EndFunction
@@ -251,7 +300,7 @@ Function StopAllNippleSquirts()
 		actorRef = armorActors[i]
 		if actorRef
 			LactisNippleSquirtArmor[] actorArmors = GetArmorRefs(actorRef)
-			StopNippleSquirt(actorRef, actorArmors[0], actorArmors[1])
+			StopNippleSquirtInternal(actorRef, actorArmors[0], actorArmors[1])
 			RemoveArmorRefs(actorRef)
 		endif
 		i += 1
@@ -260,22 +309,37 @@ EndFunction
 
 
 ; Updates the properties of the given armor object reference.
-; Note that all parameters but the nippleOffset applies to the left and right armor and 
+; Note that all parameters apply to the left and right armor and 
 ; cannot be controlled individually.
-Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleOffset)
+Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleOffset, float actorEmitterScale)
 	armorRef.NippleOffset = nippleOffset
 	armorRef.DebugAxisEnabled = DebugAxisEnabled
 	armorRef.GlobalEmitterScale = GlobalEmitterScale
-	if (ostim)
+	if ostim && ostim.AnimationRunning()
 		armorRef.EmitterScale = MapInterval(ostim.GetSpankCount(), 0.0, ostimSpankMax, ostimSquirtScaleMin, ostimSquirtScaleMax, true)
 	else
-		armorRef.EmitterScale = 1.0
+		armorRef.EmitterScale = actorEmitterScale
 	endif
 	armorRef.UseRandomEmitterScale = UseRandomEmitterScale
 	armorRef.UseRandomYRotation = UseRandomYRotation
 	armorRef.UseRandomEmitterDeactivation = UseRandomEmitterDeactivation
 	armorRef.UpdateNodeProperties()
 EndFunction
+
+; ----------------------------- Nipple leak 
+; Plays the nipple leaking effect on both breasts of the given 'ActorRef'.
+; The 'duration' is in seconds, use -1 to play the effect forever.
+Function StartNippleLeak(Actor actorRef, int duration)	
+	; Console("StartNippleLeak on actor " + actorRef + " for " + duration + " seconds.")
+	LactisNippleLeakCBBE.play(actorRef, duration)		
+EndFunction
+
+; Stops the milk leaking effect on both breasts
+Function StopNippleLeak(Actor actorRef)	
+	; Console("StopNippleLeak on actor " + actorRef)
+	LactisNippleLeakCBBE.Stop(actorRef)		
+EndFunction
+
 
 ; ----------------------------- Armor reference storage utilities
 
@@ -410,7 +474,7 @@ Function PlayOrgasmSquirt(Actor actorRef)
 	Utility.Wait(OStimOrgasmSquirtDuration)
 
 	; Console("Stopping left and right nipple squirt")
-	StopNippleSquirt(actorRef, armorLeftRef, armorRightRef)
+	StopNippleSquirtInternal(actorRef, armorLeftRef, armorRightRef)
 
 	armorLeftRef = None
 	armorRightRef = None
@@ -453,13 +517,13 @@ Function PlaySpankSquirt(Actor actorRef)
 		StartNippleLeak(actorRef, 10)
 	endif
 
-	if ostim.IsInFreeCam()
+	; if ostim.IsInFreeCam()
 		actorRef.QueueNiNodeUpdate()
-	endif
+	; endif
 
 	Utility.Wait(OStimSpankSquirtDuration)
 	
-	StopNippleSquirt(actorRef, armorLeftRef, armorRightRef)
+	StopNippleSquirtInternal(actorRef, armorLeftRef, armorRightRef)
 	armorLeftRef = None
 	armorRightRef = None
 
@@ -496,7 +560,7 @@ Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, For
 		
 		Utility.Wait(OStimSpankSquirtDuration)
 
-		StopNippleSquirt(actorRef, armorLeftRef, armorRightRef)		
+		StopNippleSquirtInternal(actorRef, armorLeftRef, armorRightRef)		
 		armorLeftRef = None
 		armorRightRef = None	
 	endif

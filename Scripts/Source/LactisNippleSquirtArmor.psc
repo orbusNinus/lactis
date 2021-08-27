@@ -19,6 +19,7 @@ String Property LactisEmitter3Name Auto
 Float[] rot 
 Form baseObject
 ArmorAddon armorAA
+int currentLevel
 
 Event OnInit()    
     baseObject = self.GetBaseObject()
@@ -26,8 +27,9 @@ Event OnInit()
     ; OnInit the actorRef will always be the default value set in the CK (set to PlayerRef there)    
     ; Console("OnInit: self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef)   
     ; Thus the update here will be wasted when the actor is not the player after container change
-    ; Update()
+    
     rot = new Float[3]
+    currentLevel = 0
 EndEvent
 
 ; Event OnGameLoad()    
@@ -78,9 +80,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
     EndIf
 EndEvent
 
-Function Update()
-    ; Console("Update")
-        
+Function Update()        
     if (UseRandomYRotation == true)
         ; Console("OnUpdate: UseRandomYRotation=" + UseRandomYRotation)
         NetImmerse.GetNodeLocalRotationEuler(ActorRef, LactisGroupName, rot, false)
@@ -125,10 +125,15 @@ Function Update()
 EndFunction
 
 Function SetLevel(int index, bool doEquip=true)
+    if index>2
+        index=2
+    endif
     ; Console("index=" + index)
     ; ArmorAddon aal = (baseObject as Armor).GetNthArmorAddon(0)
     armorAA.SetModelPath(levelNifs[index], false, true)
     ; ActorRef.QueueNiNodeUpdate()
+
+    currentLevel = index
 
     if doEquip
         ; it seems that QueueNiNodeUpdate() does NOT force the new nif to be shown/loaded.
@@ -143,9 +148,14 @@ Function SetLevel(int index, bool doEquip=true)
     endif
 EndFunction
 
+int Function GetLevel()
+    return currentLevel
+EndFunction
 
-; Updates the left debug axis. Changes it's scale depending on whether it is enabled
-; in MCM or not. If disabled, scale will be set to 0 to make the axis invisible.
+
+; Updates armor node position, scale and the debug axis. Changes it's scale 
+; depending on whether it is enabled in MCM or not. If disabled, scale will be
+; set to 0 to make the axis invisible.
 Function UpdateNodeProperties() 
 	if (DebugAxisEnabled==true)
 		NetImmerse.SetNodeScale(ActorRef, LactisAxisName, 0.25, false)
@@ -153,7 +163,9 @@ Function UpdateNodeProperties()
 		NetImmerse.SetNodeScale(ActorRef, LactisAxisName, 0, false)
 	endif
     NetImmerse.SetNodeLocalPosition(ActorRef, LactisGroupName, NippleOffset, false)
-    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, GlobalEmitterScale*EmitterScale, false)
+    float totalScale = GlobalEmitterScale*EmitterScale
+    Console("UpdateNodeProperties: actorRef=" + ActorRef + ", GlobalEmitterScale=" + GlobalEmitterScale + ", EmitterScale=" + EmitterScale + ", totalScale=" + totalScale)
+    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, totalScale, false)
     ActorRef.QueueNiNodeUpdate()
 EndFunction
 

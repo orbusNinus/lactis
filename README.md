@@ -26,6 +26,7 @@ When using standalone mode (key K) on various NPCs, leaving cells and saving/rel
 + Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.
 + Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 10 NPCs (including the player).
 + Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair). Nipple squirt for the actor must already be toggled on.
++ Press "Right Shift + Toggle Key" to force switch off the effect on the NPC under the crosshair. This should only be used as a last resort when the key "K" does not work as intended.
 
 ### OStim integration
 + If OStim is installed and integration is enabled in MCM, naked female appearing actors will nipple squirt when spanked or on orgasm.
