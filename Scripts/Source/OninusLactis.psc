@@ -15,8 +15,12 @@
 ;
 ; + StartNippleSquirt(Actor actorRef, int level=0)
 ; + StopNippleSquirt(Actor actorRef) 
-; + ToggleNippleSquirt(Actor actorRef, int level)
+; + ToggleNippleSquirt(Actor actorRef, int level=0)
+; + PlayNippleSquirt(Actor actorRef, float duration, int level=0)
+; + HasNippleSquirt(Actor actorRef)
 ;
+; All other functions and properties are considered private and should not be 
+; used by other mods. 
 
 ScriptName OninusLactis extends Quest
 
@@ -52,12 +56,7 @@ Actor[] Property armorActors Auto
 LactisNippleSquirtArmor[] Property armorRefsLeft Auto
 LactisNippleSquirtArmor[] Property armorRefsRight Auto
 
-; --- Internal state variables
-
-Int switch = 0
-
-; --- Actor offsets storage
-
+; Actor data storage. Stores offset and scale for NPCs.
 LactisActorStorage Property actorStorage Auto
 
 ; --- OStim integration
@@ -222,6 +221,11 @@ Function PlayNippleSquirt(Actor actorRef, float duration, int level=0)
 	Utility.Wait(duration)
 	StopNippleSquirt(actorRef)
 EndFunction
+
+bool Function HasNippleSquirt(Actor actorRef)
+	return actorRef.IsEquipped(LactisNippleSquirtArmorL)
+EndFunction
+
 
 ; --- Nipple squirt private / internal functions
 

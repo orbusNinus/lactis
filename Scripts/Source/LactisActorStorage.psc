@@ -1,7 +1,5 @@
 ScriptName LactisActorStorage extends Form Hidden
 
-; OninusLactis Main
-
 string npcsKey = "LactisNpsc"
 string offsetKey = "LactisNippleOffset"
 string scaleKey = "LactisEmitterScale"

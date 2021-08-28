@@ -165,7 +165,9 @@ Function UpdateNodeProperties()
     NetImmerse.SetNodeLocalPosition(ActorRef, LactisGroupName, NippleOffset, false)
     float totalScale = GlobalEmitterScale*EmitterScale
     Console("UpdateNodeProperties: actorRef=" + ActorRef + ", GlobalEmitterScale=" + GlobalEmitterScale + ", EmitterScale=" + EmitterScale + ", totalScale=" + totalScale)
-    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, totalScale, false)
+    NetImmerse.SetNodeScale(ActorRef, LactisGroupName, totalScale, false)    
+    ; NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 23, -1, 2, false)
+    
     ActorRef.QueueNiNodeUpdate()
 EndFunction
 
