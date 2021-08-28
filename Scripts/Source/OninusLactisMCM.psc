@@ -431,18 +431,31 @@ EndFunction
 
 Actor[] Function GetNearbyFemaleActors()
 	Actor[] actors = MiscUtil.ScanCellNPCs(Main.PlayerRef)
+	; remove player actor from the list
 	actors = PapyrusUtil.RemoveActor(actors, Main.PlayerRef)
-	int i=0
-	while i<actors.length
+
+	int i = actors.length - 1
+	Actor actorAtIndex = None
+
+	Keyword actorKeyword = Keyword.GetKeyword("ActorTypeNPC")
+
+	; iterating reversed as we modify the array
+	while i>=0
+		actorAtIndex = actors[i]
 		; remove all non-female actors
-		if actors[i].GetActorBase().GetSex()!=1
-			actors = PapyrusUtil.RemoveActor(actors, actors[i])
+		if actorAtIndex.GetActorBase().GetSex()!=1
+			actors = PapyrusUtil.RemoveActor(actors, actorAtIndex)
 		endif
 		; remove all actors which already have their offset stored
-		if Main.actorStorage.HasNpcStorage(actors[i])
-			actors = PapyrusUtil.RemoveActor(actors, actors[i])
+		if Main.actorStorage.HasNpcStorage(actorAtIndex)
+			actors = PapyrusUtil.RemoveActor(actors, actorAtIndex)
 		endif
-		i = i+1
+		; remove all actors which do not have the "ActorTypeNPC" keyword
+		if !actorAtIndex.HasKeyword(actorKeyword)
+			actors = PapyrusUtil.RemoveActor(actors, actorAtIndex)
+		endif
+		i -= 1
 	endwhile
+
 	return actors
 EndFunction
