@@ -25,17 +25,17 @@ Event OnInit()
     baseObject = self.GetBaseObject()
     armorAA = (baseObject as Armor).GetNthArmorAddon(0)
     ; OnInit the actorRef will always be the default value set in the CK (set to PlayerRef there)    
-    ; Console("OnInit: self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef)   
-    ; Thus the update here will be wasted when the actor is not the player after container change
+    Console("OnInit: actorName=" + (GetBaseObject() as Actor).GetLeveledActorBase().GetName() + ", self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef + ", EmitterScale=" + EmitterScale)
+    ; Thus the update here will be wasted when the actor is not the player after container change    
     
     rot = new Float[3]
     currentLevel = 0
 EndEvent
 
-; Event OnGameLoad()    
-;     Console("OnGameLoad")
-;     rot = new Float[3]
-; EndEvent
+Event OnGameLoad()    
+    Console("OnGameLoad")
+    rot = new Float[3]
+EndEvent
 
 ; Event OnUnload()
 ;     Console("OnUnload")

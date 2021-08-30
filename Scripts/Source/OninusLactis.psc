@@ -72,6 +72,9 @@ Event OnInit()
 	Maintenance()
 EndEvent
 
+float Function GetVersion()
+	return fVersion
+EndFunction
 
 Function Maintenance()
 	If fVersion < 0.5; <--- Edit this value when updating
@@ -100,6 +103,8 @@ Function Maintenance()
 	elseif ostim==None
 		Console("OStim not installed.")	
 	endif	
+
+	ApplyArmoredActorProperties()
 
 	Utility.Wait(0.1)
 EndFunction
@@ -196,6 +201,8 @@ Function StopNippleSquirt(Actor actorRef)
 	Utility.Wait(0.1)
 EndFunction
 
+; Toggles the nipple squirt effect for the given 'actorRef' on or off using 
+; the given squirt 'level' in the range [0..2].
 Function ToggleNippleSquirt(Actor actorRef, int level=0)
 	bool hasNippleSquirt = HasArmorRefs(actorRef)	
 	; Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
@@ -216,12 +223,17 @@ Function ToggleNippleSquirt(Actor actorRef, int level=0)
 	actorRef.QueueNiNodeUpdate()
 EndFunction
 
+; Plays the nipple squirt effect on the given 'artorRef' for the given 'duration'
+; specified in seconds using the given squirt 'level' in the range [0..2].
+; The effect will automatically stop and removed from the actor after the given 
+; duration.
 Function PlayNippleSquirt(Actor actorRef, float duration, int level=0)
 	StartNippleSquirt(actorRef, level)
 	Utility.Wait(duration)
 	StopNippleSquirt(actorRef)
 EndFunction
 
+; Checks whether the given 'actorRef' has the nipple squirt effect running.
 bool Function HasNippleSquirt(Actor actorRef)
 	return actorRef.IsEquipped(LactisNippleSquirtArmorL)
 EndFunction
@@ -330,6 +342,20 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleO
 	armorRef.UpdateNodeProperties()
 EndFunction
 
+Function ApplyArmoredActorProperties()
+	int i = 0
+	Actor actorRef = None
+	while i < armorActors.Length
+		actorRef = armorActors[i]
+		if actorRef != None
+			LactisNippleSquirtArmor[] armors = GetArmorRefs(actorRef)
+			armors[0].UpdateNodeProperties()
+			armors[1].UpdateNodeProperties()
+		endif
+		i += 1
+	endwhile
+EndFunction
+
 ; ----------------------------- Nipple leak 
 ; Plays the nipple leaking effect on both breasts of the given 'ActorRef'.
 ; The 'duration' is in seconds, use -1 to play the effect forever.
@@ -345,8 +371,14 @@ Function StopNippleLeak(Actor actorRef)
 EndFunction
 
 
-; ----------------------------- Armor reference storage utilities
+; ------------------------- Armor reference storage utilities
+;
+; Actors with active nipple squirt effect (i.e. the nipple squirt armor equipped)
+; are stored in the 'armorActors' array which can store up to 10 entries.
+;
 
+; Returns whether the given 'actorRef' has the nipple squirt armor equipped, by 
+; checking the internal 'armorActors' for the 'actorRef'.
 bool Function HasArmorRefs(Actor actorRef)
 	int actorIndex = armorActors.Find(actorRef)
 	if actorIndex >= 0
@@ -356,7 +388,8 @@ bool Function HasArmorRefs(Actor actorRef)
 	endif
 EndFunction
 
-; Stores the left and right armor references for the given actorRef
+; Stores the left and right armor references for the given actorRef in the 
+; internal 'armorActors' array.
 int Function StoreArmorRefs(Actor actorRef, LactisNippleSquirtArmor armorRefLeft, LactisNippleSquirtArmor armorRefRight)
 	int firstFreeIndex = armorActors.Find(None)
 	if firstFreeIndex>=0
@@ -396,7 +429,8 @@ Function RemoveArmorRefs(Actor actorRef)
 	EndIf
 EndFunction
 
-; Gets the number of actors with active nipple squirt armor.
+; Gets the number of actors with active nipple squirt armor stored in the internal
+; 'armorActors' arrary.
 Int Function GetArmoredActorsCount()
 	int i = 0	
 	int len = armorActors.Length
