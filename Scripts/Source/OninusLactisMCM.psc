@@ -100,6 +100,9 @@ Event OnPageReset(string page)
 		AddEmptyOption()
 		AddTextOption("Active nipple squirts", Main.GetArmoredActorsCount() )
 		optionResetAll = AddTextOption("Reset all", "Click")
+		
+		AddEmptyOption()
+		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
 	ElseIf Page == "Actor Offsets"		
 		SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Actor Nipple Offsets")
@@ -139,8 +142,6 @@ Event OnPageReset(string page)
 			optionNpcDelete = AddTextOption("Delete actor", "Delete")
 		endif
 
-		AddEmptyOption()
-		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
     EndIF
 EndEvent
 
