@@ -71,7 +71,7 @@ Event OnPageReset(string page)
         SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Keyboard (Manual mode)")        
         optionKeyStartLactating = AddKeyMapOption("Toggle nipple squirt key", Main.StartLactatingKey)
-		AddHeaderOption("Nipple Offset")
+		AddHeaderOption("Player Nipple Offset")
         optionOffsetLeftX = AddSliderOption("Left / Right", Main.NippleOffsetL[0], "{2}")        
         optionOffsetLeftY = AddSliderOption("Up / Down", Main.NippleOffsetL[2], "{2}")
         optionOffsetLeftZ = AddSliderOption("Back / Forth", Main.NippleOffsetL[1], "{2}")
@@ -100,14 +100,18 @@ Event OnPageReset(string page)
 		AddEmptyOption()
 		AddTextOption("Active nipple squirts", Main.GetArmoredActorsCount() )
 		optionResetAll = AddTextOption("Reset all", "Click")
-		
+
 		AddEmptyOption()
 		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
 	ElseIf Page == "Actor Offsets"		
 		SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Actor Nipple Offsets")
 		Actor actorRef = GetTargetActor("Console")
-		optionNpcConsole = AddTextOption("Console: " + ActorName(actorRef), "Select")
+		int flags = 0
+		If actorRef==None
+			flags = OPTION_FLAG_DISABLED
+		EndIf
+		optionNpcConsole = AddTextOption("Console: " + ActorName(actorRef), "Select", flags)
 		AddEmptyOption()
 		AddHeaderOption("Stored actor offsets")
 		int npcCount = Main.actorStorage.GetNpcStorageCount()
@@ -403,6 +407,7 @@ event OnOptionHighlight(int option)
 	endIf
 endEvent
 
+; Selected actor on the MCM actor offsets page
 Actor selectedActor = None
 
 Function SetSelectedActor(Actor actorRef)
