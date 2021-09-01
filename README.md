@@ -10,6 +10,26 @@ A simple lactating/nipple squirt mod for OStim. This is a visual effect and no m
 + [CBBE 3BA (3BBB)](https://www.nexusmods.com/skyrimspecialedition/mods/30174) optional
 + [XPMSSE](https://www.nexusmods.com/skyrimspecialedition/mods/1988?tab=files)
 
+## Features
+
+### General
++ Useable with OStim and standalone
++ Separate player and per NPC nipple squirt offset and scaling.
++ (Optional) CBBE nipple leak overlay. 
++ For mod authors: Public API to integrate the effect into other mods.
+
+### Standalone mode
++ Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.
++ Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 10 NPCs (including the player).
++ Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair). Effect for the actor must already be toggled on.
++ Press "Right Shift + Toggle Key" to force switch off the effect on the NPC under the crosshair. This should only be used as a last resort when the key "K" does not work as intended.
+
+### OStim integration mode
++ If OStim is installed and integration is enabled in MCM, naked female appearing actors will nipple squirt when spanked or on orgasm.
++ Nipple squirt scale can be increased by spanking (currently this resets the configured NPC effect scaling and uses the same scaling range for every actor)
++ Nipple squirt duration can be configured via MCM for spank and orgasm squirt separately.
++ The "K" key is disabled during OStim scenes (might be changed in the future to have more control)
+
 ## Installation
 Install with your favorite mod manager (developed and tested with MO2).
 
@@ -17,22 +37,6 @@ Install with your favorite mod manager (developed and tested with MO2).
 Reset all active nipple squirt effects via the MCM menu before deinstalling the mod. 
 I consider this mod safe for the OStim effects.
 When using standalone mode (key K) on various NPCs, leaving cells and saving/reloading save games, there might be issues with save game bloat which I didn't figure out yet. 
-
-## Features
-
-+ (Optional) CBBE nipple leak overlay. 
-
-### Standalone
-+ Press "K" with no NPC under the crosshair to toggle the effect on/off for the player.
-+ Press "K" key to toggle the effect on/off for any female NPC under the crosshair. Supports up to 10 NPCs (including the player).
-+ Press "Left Shift + K" to switch between three levels of squirt for the NPC under the crosshair (or the player if no NPC is under the crosshair). Nipple squirt for the actor must already be toggled on.
-+ Press "Right Shift + Toggle Key" to force switch off the effect on the NPC under the crosshair. This should only be used as a last resort when the key "K" does not work as intended.
-
-### OStim integration
-+ If OStim is installed and integration is enabled in MCM, naked female appearing actors will nipple squirt when spanked or on orgasm.
-+ Nipple squirt scale can be increased by spanking. Currently the scale applies to all actors as I have not found a way to determine which actor got spanked.
-+ Nipple squirt duration can be configured via MCM for spank and orgasm squirt separately.
-+ The "K" key is disabled during OStim scenes (might be changed in the future to have more control)
 
 ## Physics
 Developed and works best with CBPC. With SMP nipple offset is somewhat off/delayed.
@@ -55,36 +59,43 @@ The left/right armor use the **body slots 58/59**.
 + It also might happen that you will not be able to stop the nipple squirt of an NPC by using the toggle key. As a last resort you can try to **Right Shift + Toggle Key"** on the NPC. This should remove the effect but can lead to save game bloat. (feature will be available in >v0.31)
 
 ## MCM configuration
-Use MCM to configure the left and right nipple offset. You can enable a debug axis to make this step easier.
+Use MCM to configure nipple offset and scale for the player and NPCs. You can enable a debug axis to make this step easier.
 Use other parameters to adjust effect if desired.
 
 The standalone nipple squirt effect can be toggled on/off via the key "K" (can be configured via MCM). This works for up to 10 NPCS and the player actor. The effect can be toggled on/off at any time even when your character or the NPC is not naked.
 
-### Toggle nipple squirt key
+### Settings page
+
+#### Toggle nipple squirt key
 Key for toggling nipple squirting on/off on the player. Does not work during OStim scenes.
 
-### Nipple Offset
-Offset for the nipple squirt emitter origin. Adjust to match the player's body. Note that offset will be used for both breasts, x offset will be adjusted for each side.
+#### Player Nipple Offset
+Player offset for the nipple squirt emitter origin. Adjust to match the player's body. Note that offset will be used for both breasts, x offset will be adjusted for each side.
 
-### Enable OStim integration
+#### Enable OStim integration
 Enables OStim integration. Female actors will nipple squirt on spank and orgasm during an OStim scene.
 
-### Spank squirt duration
+#### Spank squirt duration
 Nipple squirt duration on spank (in seconds).
 
-### Orgasm squirt duration
+#### Orgasm squirt duration
 Nipple squirt duration on orgasm (in seconds).
 
-### Nipple squirt when not naked
+#### Nipple squirt when not naked
 Nipple squirt even when actor is not naked. This might help with revealing armors/clothing.
 
-### Enable nipple leak (CBBE EffectShader)
+#### Enable nipple leak (CBBE EffectShader)
 Enables an CBBE overlay texture which simulates nipple leak.
 
-### Enable debug axis
-Enables a debug axis for nipple offset adjustments.
+#### Enable debug axis
+Enables a debug axis for nipple offset adjustments. Applies to player and NPCs.
 
-### Global emitter scale
-Global emitter scale for left and right emitters.
+#### Global emitter scale
+Global emitter scale for left and right emitters. Applies to player and NPCs.
 
+### Actor offsets page
+
+Select an actor from *Stored actor offset* or *Nearby actors*.
+
+Configure the offset and scale, all changes are automatically saved. You have to exit MCM and re-toggle the effect to have the new values applied.
 
