@@ -95,11 +95,7 @@ Function Maintenance()
 	endif
 	If (ostim && OStimIntegrationEnabled)
 		Console("OStim " + ostim.GetAPIVersion() + " installed. Integration enabled.")
-		RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
-		RegisterForModEvent("ostim_spank", "OnOstimSpank")			
-		RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
-		RegisterForModEvent("ostim_end", "OnOStimEnd")		
-		; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")			
+		RegisterForOStimEvents()
 	elseif ostim==None
 		Console("OStim not installed.")	
 	endif	
@@ -109,6 +105,20 @@ Function Maintenance()
 	Utility.Wait(0.1)
 EndFunction
 
+Function RegisterForOStimEvents()
+	RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
+	RegisterForModEvent("ostim_spank", "OnOstimSpank")			
+	RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
+	RegisterForModEvent("ostim_end", "OnOStimEnd")		
+	; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")		
+EndFunction
+
+Function UnregisterForOStimEvents()
+	UnregisterForModEvent("ostim_orgasm")
+	UnregisterForModEvent("ostim_spank")
+	UnregisterForModEvent("ostim_prestart")
+	UnregisterForModEvent("ostim_end")
+EndFunction
 
 Event OnKeyDown(Int keyCode)
 	; https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes	
@@ -332,7 +342,7 @@ Function UpdateArmorProperties(LactisNippleSquirtArmor armorRef, Float[] nippleO
 	armorRef.DebugAxisEnabled = DebugAxisEnabled
 	armorRef.GlobalEmitterScale = GlobalEmitterScale
 	if ostim && ostim.AnimationRunning()
-		armorRef.EmitterScale = MapInterval(ostim.GetSpankCount(), 0.0, ostimSpankMax, ostimSquirtScaleMin, ostimSquirtScaleMax, true)
+		armorRef.EmitterScale = MapValue(ostim.GetSpankCount(), 0.0, ostimSpankMax, ostimSquirtScaleMin, ostimSquirtScaleMax, true)
 	else
 		armorRef.EmitterScale = actorEmitterScale
 	endif
@@ -469,7 +479,7 @@ EndFunction
 ; <param name='dstMin'>The minimum value of the destination interval.</param>
 ; <param name='dstMax'>The maximum value of the destination interval.</param>
 ; <param name='clamp'>Clamp values outside [dstMin..dstMax] or not.</param>
-float Function MapInterval(float val, float srcMin, float srcMax, float dstMin, float dstMax, bool clamp) global
+float Function MapValue(float val, float srcMin, float srcMax, float dstMin, float dstMax, bool clamp) global
 	if clamp
 		if (val>=srcMax) 
 			return dstMax

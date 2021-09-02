@@ -83,21 +83,27 @@ Event OnPageReset(string page)
 		if Main.HasOStim()
 			AddHeaderOption("OStim integration")
 			optionOStimIntegrationEnabled = AddToggleOption("Enable OStim integration", Main.OStimIntegrationEnabled)
-			optionOStimSpankSquirtDuration = AddSliderOption("Spank squirt duration", Main.OStimSpankSquirtDuration, "{2}")        
-			optionOStimOrgasmSquirtDuration = AddSliderOption("Orgasm squirt duration", Main.OStimOrgasmSquirtDuration, "{2}")        
-			optionOStimNonNakedSquirtEnabled = AddToggleOption("Nipple squirt when not naked", Main.OStimNonNakedSquirtEnabled)
+			int flags = 0
+			If !Main.OStimIntegrationEnabled
+				flags = OPTION_FLAG_DISABLED
+			EndIf
+			optionOStimSpankSquirtDuration = AddSliderOption("Spank squirt duration", Main.OStimSpankSquirtDuration, "{2}", flags)        
+			optionOStimOrgasmSquirtDuration = AddSliderOption("Orgasm squirt duration", Main.OStimOrgasmSquirtDuration, "{2}", flags)        
+			optionOStimNonNakedSquirtEnabled = AddToggleOption("Nipple squirt when not naked", Main.OStimNonNakedSquirtEnabled, flags)
 		endif		
-		optionNippleLeakEnabled = AddToggleOption("Enable nipple leak (CBBE EffectShader)", Main.NippleLeakEnabled)
 
 		SetCursorPosition(1)
-		AddHeaderOption("Debug")
+		AddHeaderOption("Global settings")
 		optionDebugAxisEnabled = AddToggleOption("Enable debug axis", Main.DebugAxisEnabled)
-		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 		        
-		; AddHeaderOption("Experimental")
+		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 		
+		optionNippleLeakEnabled = AddToggleOption("Enable nipple leak (CBBE EffectShader)", Main.NippleLeakEnabled)
+
+		AddEmptyOption()
+		AddHeaderOption("Maintenance")
 		; optionRandomYRotEnabled = AddToggleOption("Enable random Y rotation", Main.UseRandomYRotation)
 		; optionRandomEmitterScaleEnabled = AddToggleOption("Enable random emitter scale", Main.UseRandomEmitterScale)
 		; optionRandomEmitterDeactivationEnabled = AddToggleOption("Enable random emitter deactivation", Main.UseRandomEmitterDeactivation)		
-		AddEmptyOption()
+		
 		AddTextOption("Active nipple squirts", Main.GetArmoredActorsCount() )
 		optionResetAll = AddTextOption("Reset all", "Click")
 
@@ -152,7 +158,13 @@ EndEvent
 event OnOptionSelect(int option)
 	if (option == optionOStimIntegrationEnabled)
 		Main.OStimIntegrationEnabled = !Main.OStimIntegrationEnabled
+		if Main.OStimIntegrationEnabled
+			Main.RegisterForOStimEvents()
+		Else
+			Main.UnregisterForOStimEvents()
+		endif
 		SetToggleOptionValue(optionOStimIntegrationEnabled, Main.OStimIntegrationEnabled)
+		ForcePageReset()
 	elseif (option == optionOStimNonNakedSquirtEnabled)
 		Main.OStimNonNakedSquirtEnabled = !Main.OStimNonNakedSquirtEnabled
 		SetToggleOptionValue(optionOStimNonNakedSquirtEnabled, Main.OStimNonNakedSquirtEnabled)
