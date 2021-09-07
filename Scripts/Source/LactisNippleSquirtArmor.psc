@@ -1,3 +1,11 @@
+;
+; ███████╗ ██████╗ ██╗   ██╗██╗██████╗ ████████╗     █████╗ ██████╗ ███╗   ███╗ ██████╗ ██████╗ 
+; ██╔════╝██╔═══██╗██║   ██║██║██╔══██╗╚══██╔══╝    ██╔══██╗██╔══██╗████╗ ████║██╔═══██╗██╔══██╗
+; ███████╗██║   ██║██║   ██║██║██████╔╝   ██║       ███████║██████╔╝██╔████╔██║██║   ██║██████╔╝
+; ╚════██║██║▄▄ ██║██║   ██║██║██╔══██╗   ██║       ██╔══██║██╔══██╗██║╚██╔╝██║██║   ██║██╔══██╗
+; ███████║╚██████╔╝╚██████╔╝██║██║  ██║   ██║       ██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██║  ██║
+; ╚══════╝ ╚══▀▀═╝  ╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+                                                                                              
 Scriptname LactisNippleSquirtArmor extends ObjectReference  
  
 Actor Property ActorRef Auto
@@ -22,20 +30,24 @@ ArmorAddon armorAA
 int currentLevel
 
 Event OnInit()    
+    If self == None
+        return
+    EndIf
+    
     baseObject = self.GetBaseObject()
     armorAA = (baseObject as Armor).GetNthArmorAddon(0)
     ; OnInit the actorRef will always be the default value set in the CK (set to PlayerRef there)    
-    Console("OnInit: actorName=" + (GetBaseObject() as Actor).GetLeveledActorBase().GetName() + ", self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef + ", EmitterScale=" + EmitterScale)
+    Console("OnInit: actorName=" + ", self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef + ", EmitterScale=" + EmitterScale)
     ; Thus the update here will be wasted when the actor is not the player after container change    
     
     rot = new Float[3]
     currentLevel = 0
 EndEvent
 
-Event OnGameLoad()    
-    Console("OnGameLoad")
-    rot = new Float[3]
-EndEvent
+; Event OnGameLoad()    
+;     Console("OnGameLoad")
+;     rot = new Float[3]
+; EndEvent
 
 ; Event OnUnload()
 ;     Console("OnUnload")
@@ -70,8 +82,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
         UpdateNodeProperties()
         ; float ftimeEnd2  = Utility.GetCurrentRealTime() 
         ; Console("## Equipping took " + (ftimeEnd - ftimeStart) + "s. Updating node props took " + (ftimeEnd2-ftimeStart) + "s, " + ", total=" + (ftimeEnd-ftimeStart))
-                
-        ; RegisterForSingleUpdate(0.01)
+                        
         ActorRef.QueueNiNodeUpdate()        
         Utility.Wait(0.05)
     Else

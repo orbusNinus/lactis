@@ -1,10 +1,10 @@
 ;
-; 			██╗      █████╗  ██████╗████████╗██╗███████╗
-; 			██║     ██╔══██╗██╔════╝╚══██╔══╝██║██╔════╝
-; 			██║     ███████║██║        ██║   ██║███████╗
-; 			██║     ██╔══██║██║        ██║   ██║╚════██║
-; 			███████╗██║  ██║╚██████╗   ██║   ██║███████║
-; 			╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝╚══════╝
+; ██╗      █████╗  ██████╗████████╗██╗███████╗
+; ██║     ██╔══██╗██╔════╝╚══██╔══╝██║██╔════╝
+; ██║     ███████║██║        ██║   ██║███████╗
+; ██║     ██╔══██║██║        ██║   ██║╚════██║
+; ███████╗██║  ██║╚██████╗   ██║   ██║███████║
+; ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝╚══════╝
 ;								
 ; If you are a mod developer and want to integrate the nipple squirt effect 
 ; into your own mod, use the following public API. See the indiviudal functions
@@ -27,10 +27,10 @@ ScriptName OninusLactis extends Quest
 ; --- Properties
 
 Actor Property PlayerRef Auto
-Armor Property LactisNippleSquirtArmorL Auto
-Armor Property LactisNippleSquirtArmorR Auto
+Armor LactisNippleSquirtArmorL 
+Armor LactisNippleSquirtArmorR
 
-EffectShader property LactisNippleLeakCBBE auto
+EffectShader LactisNippleLeakCBBE
 ; MagicEffect Property HentaiMilkSquirtSpellEffect Auto
 
 Int Property StartLactatingKey Auto
@@ -52,9 +52,9 @@ Bool Property UseRandomEmitterDeactivation Auto
 
 Float fVersion
 
-Actor[] Property armorActors Auto
-LactisNippleSquirtArmor[] Property armorRefsLeft Auto
-LactisNippleSquirtArmor[] Property armorRefsRight Auto
+Actor[] armorActors
+ObjectReference[] armorRefsLeft
+ObjectReference[] armorRefsRight
 
 ; Actor data storage. Stores offset and scale for NPCs.
 LactisActorStorage Property actorStorage Auto
@@ -82,6 +82,22 @@ Function Maintenance()
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf	
+
+	LactisNippleSquirtArmorL = game.GetFormFromFile(0x003312, "OninusLactis.esp") as Armor
+	LactisNippleSquirtArmorR = game.GetFormFromFile(0x003875, "OninusLactis.esp") as Armor
+
+	LactisNippleLeakCBBE  = game.GetFormFromFile(0x001D85, "OninusLactis.esp") as EffectShader
+
+	Console("armorActors=" + armorActors)
+	Console("armorRefsLeft=" + armorRefsLeft)	
+	Console("armorRefsRight=" + armorRefsRight)	
+	If (armorActors.Length==0)
+		armorActors = new Actor[10]
+		armorRefsLeft = new ObjectReference[10]
+		armorRefsRight = new ObjectReference[10]
+		Console("armorActors initialized." + armorActors)			
+	EndIf	
+
 	actorStorage = (self as Form) as LactisActorStorage
 	; Console("actorStorage: " + actorStorage)
 
@@ -159,19 +175,37 @@ Event OnKeyDown(Int keyCode)
 
 EndEvent
 
+Function Uninstall()
+	Console("Uninstalling Lactis")
+	StopAllNippleSquirts()
+	actorStorage.Clear()
+	UnregisterForAllModEvents()
+	UnregisterForAllKeys()	
+	Reset()
+	Stop()
+EndFunction
+
 ; Used by the MCM script. When querying OStim during gameplay the ostim variable
 ; should be checked directly for performance reasons.
 Bool Function HasOStim() 	
 	return ostim!=None
 EndFunction
 
-
-; --- Nipple squirt public API
-
-; Start the nipple squirt effect on the given 'actorRef' using the given squirt 'level' in the range [0..2].
+;
+; ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗     █████╗ ██████╗ ██╗
+; ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝    ██╔══██╗██╔══██╗██║
+; ██████╔╝██║   ██║██████╔╝██║     ██║██║         ███████║██████╔╝██║
+; ██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║         ██╔══██║██╔═══╝ ██║
+; ██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
+; ╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
+                                                                                                                                                                                      
+; Start the nipple squirt effect on the given 'actorRef' using the given squirt 
+; 'level' in the range [0..2].
 ; If there are already 10 actors with an active effect the call will be ignored.
-; If the given 'actorRef' already has the nipple squirt effect running the call will be ignored.
-; If the "Nipple Leak" feature is enabled in the MCM this function will also start the nipple leak overlay.
+; If the given 'actorRef' already has the nipple squirt effect running the call 
+; will be ignored.
+; If the "Nipple Leak" feature is enabled in the MCM this function will also 
+; start the nipple leak overlay.
 Function StartNippleSquirt(Actor actorRef, int level=0)
 	if GetArmoredActorsCount() >= 10
 		return
@@ -194,7 +228,8 @@ EndFunction
 
 ; Stops the nipple squirt effect on the given 'actorRef'.
 ; If the actor does not have an nipple squirt effect running the call will be ignored.
-; If the "Nipple Leak" feature is enabled in the MCM this function will also stop the nipple leak overlay.
+; If the "Nipple Leak" feature is enabled in the MCM this function will also stop
+; the nipple leak overlay.
 Function StopNippleSquirt(Actor actorRef)
 	if !HasArmorRefs(actorRef)
 		return
@@ -215,7 +250,6 @@ EndFunction
 ; the given squirt 'level' in the range [0..2].
 Function ToggleNippleSquirt(Actor actorRef, int level=0)
 	bool hasNippleSquirt = HasArmorRefs(actorRef)	
-	; Console("ToggleNippleSquirt, actor=" + actorRef + ", hasNippleSquirt=" + hasNippleSquirt)
 	
 	; How long does our operation take?
 	; float ftimeStart = Utility.GetCurrentRealTime()
@@ -248,15 +282,20 @@ bool Function HasNippleSquirt(Actor actorRef)
 	return actorRef.IsEquipped(LactisNippleSquirtArmorL)
 EndFunction
 
-
-; --- Nipple squirt private / internal functions
+; 
+; ██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗     █████╗ ██████╗ ██╗
+; ██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝    ██╔══██╗██╔══██╗██║
+; ██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗      ███████║██████╔╝██║
+; ██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝      ██╔══██║██╔═══╝ ██║
+; ██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗    ██║  ██║██║     ██║
+; ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
+; 
 
 LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level=0)
 	; Console("StartNippleSquirtLeft")	
 	LactisNippleSquirtArmor armorLeftRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorL, 1, true) as LactisNippleSquirtArmor	
 	armorLeftRef.ActorRef = actorRef
 	armorLeftRef.SetLevel(level, false)
-	actorRef.AddItem(armorLeftRef, 1, true)
 	if actorStorage.HasNpcStorage(actorRef)
 		; update npc armors
 		UpdateArmorProperties(armorLeftRef, actorStorage.GetNpcOffset(actorRef), actorStorage.GetNpcScale(actorRef))
@@ -264,6 +303,8 @@ LactisNippleSquirtArmor Function StartNippleSquirtLeft(Actor actorRef, int level
 		; update the player's armor
 		UpdateArmorProperties(armorLeftRef, NippleOffsetL, EmitterScale)
 	endif
+
+	actorRef.AddItem(armorLeftRef, 1, true)
 	actorRef.QueueNiNodeUpdate()
 	return armorLeftRef
 EndFunction
@@ -273,7 +314,7 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 	LactisNippleSquirtArmor armorRightRef = actorRef.PlaceAtMe(LactisNippleSquirtArmorR, 1, true) as LactisNippleSquirtArmor
 	armorRightRef.ActorRef = actorRef
 	armorRightRef.SetLevel(level, false)
-	actorRef.AddItem(armorRightRef, 1, true)
+
 	if actorStorage.HasNpcStorage(actorRef)
 		; update npc armors
 		float[] offset = actorStorage.GetNpcOffset(actorRef)
@@ -284,6 +325,8 @@ LactisNippleSquirtArmor Function StartNippleSquirtRight(Actor actorRef, int leve
 		; update the player's armor
 		UpdateArmorProperties(armorRightRef, NippleOffsetR, EmitterScale)
 	endif
+
+	actorRef.AddItem(armorRightRef, 1, true)	
 	actorRef.QueueNiNodeUpdate()
 	return armorRightRef
 EndFunction
@@ -293,7 +336,7 @@ Function StopNippleSquirtInternal(Actor actorRef, LactisNippleSquirtArmor armorL
 	; Console("StopNippleSquirtInternal on actor " + actorRef + ", armorLeftRef=" + armorLeftRef + ", armorRightRef=" + armorRightRef)
 	if armorLeftRef!=None
 		actorRef.RemoveItem(armorLeftRef, 1, true)
-		actorRef.RemoveItem(armorRightRef, 1, true)
+		actorRef.RemoveItem(armorRightRef, 1, true)		
 	else
 		actorRef.RemoveItem(LactisNippleSquirtArmorL, 1, true)
 		actorRef.RemoveItem(LactisNippleSquirtArmorR, 1, true)
@@ -367,6 +410,7 @@ Function ApplyArmoredActorProperties()
 EndFunction
 
 ; ----------------------------- Nipple leak 
+
 ; Plays the nipple leaking effect on both breasts of the given 'ActorRef'.
 ; The 'duration' is in seconds, use -1 to play the effect forever.
 Function StartNippleLeak(Actor actorRef, int duration)	
@@ -419,8 +463,8 @@ LactisNippleSquirtArmor[] Function GetArmorRefs(Actor actorRef)
 	int actorIndex = armorActors.Find(actorRef)
 	if actorIndex >= 0
 		LactisNippleSquirtArmor[] armorRefs = new LactisNippleSquirtArmor[2]
-		armorRefs[0] = armorRefsLeft[actorIndex]
-		armorRefs[1] = armorRefsRight[actorIndex]
+		armorRefs[0] = armorRefsLeft[actorIndex] as LactisNippleSquirtArmor
+		armorRefs[1] = armorRefsRight[actorIndex] as LactisNippleSquirtArmor
 		return armorRefs
 	endif
 	; we cannot return None explicitly here as this will result in a runtime cast error
@@ -473,12 +517,12 @@ EndFunction
 
 ; Maps the specified value val from the interval defined by srcMin and 
 ; srcMax to the interval defined by dstMin and dstMax.
-; <returns>The value val mapped to the destination interval.</returns>
-; <param name='srcMin'>The minimum value of the source interval.</param>
-; <param name='srcMax'>The maximum value of the source interval.</param>
-; <param name='dstMin'>The minimum value of the destination interval.</param>
-; <param name='dstMax'>The maximum value of the destination interval.</param>
-; <param name='clamp'>Clamp values outside [dstMin..dstMax] or not.</param>
+; returns: The value mapped to the destination interval.
+; param 'srcMin': The minimum value of the source interval.
+; param 'srcMax': The maximum value of the source interval.
+; param 'dstMin': The minimum value of the destination interval.
+; param 'dstMax': The maximum value of the destination interval.
+; param 'clamp': clamp values outside [dstMin..dstMax] or not.
 float Function MapValue(float val, float srcMin, float srcMax, float dstMin, float dstMax, bool clamp) global
 	if clamp
 		if (val>=srcMax) 
@@ -506,8 +550,7 @@ Function PlayOrgasmSquirt(Actor actorRef)
 	if actorRef.IsEquipped(LactisNippleSquirtArmorL)
 		return
 	endif
-		
-	
+
 	if !ostim.AppearsFemale(actorRef) || (!ostim.IsNaked(actorRef) && !OStimNonNakedSquirtEnabled)
 		Console("PlayOrgasmSquirt: Orgasm squirt cancelled. "+ "actorRef.IsEquipped(LactisNippleSquirtArmorL)=" + actorRef.IsEquipped(LactisNippleSquirtArmorL) + ", ostim.IsNaked=" + ostim.IsNaked(actorRef) + ", ostim.IsFemale=" + ostim.IsFemale(actorRef) + ", AppearsFemale=" + ostim.AppearsFemale(actorRef))
 		return
@@ -581,7 +624,7 @@ Function PlaySpankSquirt(Actor actorRef)
 	Utility.Wait(0.2)
 EndFunction
 
-
+; Experimental. Not used yet.
 Event OnOstimAnimationChanged(string eventName, string strArg, float numArg, Form sender)
 	; Console("OnOstimAnimationChanged: eventName=" + eventName + ", strArg=" + strArg + ", numArg="+ numArg)
 

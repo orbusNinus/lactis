@@ -1,6 +1,15 @@
+;
+;  █████╗  ██████╗████████╗ ██████╗ ██████╗     ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗
+; ██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗    ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝
+; ███████║██║        ██║   ██║   ██║██████╔╝    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗  
+; ██╔══██║██║        ██║   ██║   ██║██╔══██╗    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝  
+; ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║    ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗
+; ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝    ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+;                                                                                                          
+
 ScriptName LactisActorStorage extends Form Hidden
 
-string npcsKey = "LactisNpsc"
+string npcsKey = "LactisNpcs"
 string offsetKey = "LactisNippleOffset"
 string scaleKey = "LactisEmitterScale"
 
@@ -18,8 +27,18 @@ Function DeleteNpcStorage(Actor actorRef)
 		StorageUtil.FloatListRemoveAt(actorRef, offsetKey, 0)
 		StorageUtil.FloatListRemoveAt(actorRef, offsetKey, 1)
 		StorageUtil.FloatListRemoveAt(actorRef, offsetKey, 2)
+		StorageUtil.FloatListClear(actorRef, offsetKey)
 		StorageUtil.UnsetFloatValue(actorRef, scaleKey)
 	endif
+EndFunction
+
+Function Clear()
+	int i = StorageUtil.FormListCount(self, npcsKey) - 1
+	While i >= 0
+		DeleteNpcStorage(GetNpcActor(i))
+		i -= 1 
+	EndWhile
+	StorageUtil.FormListClear(self, npcsKey)
 EndFunction
 
 bool Function HasNpcStorage(Actor actorRef)

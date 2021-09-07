@@ -1,3 +1,12 @@
+;
+; ██╗      █████╗  ██████╗████████╗██╗███████╗    ███╗   ███╗ ██████╗███╗   ███╗
+; ██║     ██╔══██╗██╔════╝╚══██╔══╝██║██╔════╝    ████╗ ████║██╔════╝████╗ ████║
+; ██║     ███████║██║        ██║   ██║███████╗    ██╔████╔██║██║     ██╔████╔██║
+; ██║     ██╔══██║██║        ██║   ██║╚════██║    ██║╚██╔╝██║██║     ██║╚██╔╝██║
+; ███████╗██║  ██║╚██████╗   ██║   ██║███████║    ██║ ╚═╝ ██║╚██████╗██║ ╚═╝ ██║
+; ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝╚══════╝    ╚═╝     ╚═╝ ╚═════╝╚═╝     ╚═╝
+;                                                                               
+
 Scriptname OninusLactisMCM extends SKI_ConfigBase
 
 OninusLactis Main
@@ -19,6 +28,7 @@ Int optionRandomYRotEnabled
 Int optionRandomEmitterScaleEnabled
 Int optionRandomEmitterDeactivationEnabled
 Int optionResetAll
+Int optionUninstall
 
 ; NPC offsets options
 Int optionNpcConsole
@@ -31,19 +41,21 @@ Int[] optionNpcActors
 Int[] optionNpcActorsNearby
 Actor[] nearbyActors
 
+
 int function GetVersion()
 	return 2
 endFunction
 
 Event OnConfigInit()
 	Init()
-	Pages = new string[1]
+	Pages = new string[2]
 	Pages[0] = "Settings"
+	Pages[1] = "Actor Offsets"
 EndEvent
 
 Function Init()
     Parent.OnGameReload()
-    Main = (Self as Quest) as OninusLactis
+    Main = (Self as Quest) as OninusLactis	
 EndFunction
 
 event OnVersionUpdate(int a_version)
@@ -63,7 +75,7 @@ endEvent
 
 event OnConfigClose()
 	{Called when this config menu is closed}
-	nearbyActors = None
+	; nearbyActors = None
 endEvent
 
 Event OnPageReset(string page)
@@ -109,6 +121,7 @@ Event OnPageReset(string page)
 
 		AddEmptyOption()
 		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
+		optionUninstall = AddTextOption("Uninstall Lactis", "Uninstall")
 	ElseIf Page == "Actor Offsets"		
 		SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Actor Nipple Offsets")
@@ -185,6 +198,9 @@ event OnOptionSelect(int option)
 		SetToggleOptionValue(optionRandomEmitterDeactivationEnabled, Main.UseRandomEmitterDeactivation)
 	ElseIf (option == optionResetAll)
 		Main.StopAllNippleSquirts()		
+	ElseIf option == optionUninstall
+		Main.Uninstall()
+		ShowMessage("You should save and exit the game now. Then disable the Lactis mod, start game, reload the save. Walk around, wait some time, save and exit game. Then use Resaver to clean the save.", false)
 	ElseIf (option == optionNpcConsole)
 		SetSelectedActor(GetTargetActor("Console"))
 	ElseIf optionNpcActors.Find(option)>=0
