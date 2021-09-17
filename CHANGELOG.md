@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
 
-## [1.0] - 2021-08-31 - github release
+## [1.0] - 2021-09-17 - github release
 # Added
 - Added per NPC nipple squirt effect offset and scale configuration 
   functionality.

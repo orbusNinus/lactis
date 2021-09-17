@@ -1,7 +1,9 @@
 # Lactis
-A simple lactating/nipple squirt mod for OStim. This is a visual effect and no
-milk economy style mod. It can be used without OStim in a non-lore friendly and
-non-immersive standalone mode using hotkeys.
+A simple lactating/nipple squirt mod for OStim. Supports individual player and 
+NPC effect offset and scaling. 
+It can be used without OStim in a non-lore friendly and non-immersive 
+standalone mode using hotkeys.
+This is a visual effect and no milk economy style mod. 
 
 ## Requirements
 + Skyrim: Special Edition (1.5.39+)
@@ -47,8 +49,13 @@ non-immersive standalone mode using hotkeys.
 Install with your favorite mod manager (developed and tested with MO2).
 
 ## Deinstallation
-Reset all active nipple squirt effects via the MCM menu before deinstalling the
-mod. 
+Click the uninstall option in the MCM menu. This will stop all running effects
+and delete all stored actor settings and prepare the mod for deinstallation. 
+
+After clicking the option you need to exit MCM, then save and exit the 
+game. Deactivate the Lactis mod and restart the game again. Load your save, 
+play for a little while, change cell, save and exit game again.
+Use Resaver or similiar tools to clean your save. Done.
 
 I consider this mod safe for the OStim effects.
 
