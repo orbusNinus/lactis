@@ -77,8 +77,8 @@ float Function GetVersion()
 EndFunction
 
 Function Maintenance()
-	If fVersion < 1.0; <--- Edit this value when updating
-		fVersion = 1.0; and this
+	If fVersion < 1.00; <--- Edit this value when updating
+		fVersion = 1.00; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf	
@@ -104,7 +104,7 @@ Function Maintenance()
 	; Other maintenance code that only needs to run once per save load		
 	Console("loaded version is " + fVersion)
 	RegisterForKey(StartLactatingKey)
-	
+
 	ostim = game.GetFormFromFile(0x000801, "Ostim.esp") as OsexIntegrationMain
 	if (ostim)
 		; Console("OStim " + ostim.GetAPIVersion() + " installed.")
@@ -119,70 +119,6 @@ Function Maintenance()
 	ApplyArmoredActorProperties()
 
 	Utility.Wait(0.1)
-EndFunction
-
-Function RegisterForOStimEvents()
-	RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
-	RegisterForModEvent("ostim_spank", "OnOstimSpank")			
-	RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
-	RegisterForModEvent("ostim_end", "OnOStimEnd")		
-	; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")		
-EndFunction
-
-Function UnregisterForOStimEvents()
-	UnregisterForModEvent("ostim_orgasm")
-	UnregisterForModEvent("ostim_spank")
-	UnregisterForModEvent("ostim_prestart")
-	UnregisterForModEvent("ostim_end")
-EndFunction
-
-Event OnKeyDown(Int keyCode)
-	; https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes	
-	If (Utility.IsInMenuMode() || UI.IsMenuOpen("console"))
-		Return
-	EndIf
-
-	; Console("**** A registered key has been pressed: "+ keyCode)
-
-	ObjectReference crosshairObjRef = Game.GetCurrentCrosshairRef()
-	Actor crosshairActor = crosshairObjRef as Actor
-
-	Actor affectedActor = PlayerRef
-	if crosshairActor != None
-		affectedActor = crosshairActor
-	endif
-
-	; keycode 42 = left shift
-	; keycode 54 = right shift
-	if (!ostim || (ostim && !ostim.AnimationRunning()))
-		if keyCode == StartLactatingKey && Input.IsKeyPressed(54)
-			ForceStopNippleSquirt(affectedActor)
-		elseif keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
-			ToggleNippleSquirt(affectedActor)
-		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)					
-			LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
-			LactisNippleSquirtArmor armorLeft = armorRefs[0]
-			LactisNippleSquirtArmor armorRight = armorRefs[1]
-			int currentLevel = armorLeft.GetLevel()
-			currentLevel = currentLevel + 1
-			if currentLevel > 2
-				currentLevel = 0
-			endif
-			armorLeft.SetLevel(currentLevel)
-			armorRight.SetLevel(currentLevel)
-		EndIf
-	endif
-
-EndEvent
-
-Function Uninstall()
-	Console("Uninstalling Lactis")
-	StopAllNippleSquirts()
-	actorStorage.Clear()
-	UnregisterForAllModEvents()
-	UnregisterForAllKeys()	
-	Reset()
-	Stop()
 EndFunction
 
 ; Used by the MCM script. When querying OStim during gameplay the ostim variable
@@ -502,6 +438,71 @@ EndFunction
 
 ; ---------------------------- Utility functions
 
+Event OnKeyDown(Int keyCode)
+	; https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes	
+	If (Utility.IsInMenuMode() || UI.IsMenuOpen("console"))
+		Return
+	EndIf
+
+	; Console("**** A registered key has been pressed: "+ keyCode)
+
+	ObjectReference crosshairObjRef = Game.GetCurrentCrosshairRef()
+	Actor crosshairActor = crosshairObjRef as Actor
+
+	Actor affectedActor = PlayerRef
+	if crosshairActor != None
+		affectedActor = crosshairActor
+	endif
+
+	; keycode 34 = G
+	; keycode 35 = H
+	; keycode 42 = left shift
+	; keycode 54 = right shift
+	if (!ostim || (ostim && !ostim.AnimationRunning()))
+		if keyCode == StartLactatingKey && Input.IsKeyPressed(54)
+			ForceStopNippleSquirt(affectedActor)
+		elseif keyCode == StartLactatingKey  && !Input.IsKeyPressed(42)
+			ToggleNippleSquirt(affectedActor)
+		elseif keyCode == StartLactatingKey && Input.IsKeyPressed(42)					
+			LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
+			LactisNippleSquirtArmor armorLeft = armorRefs[0]
+			LactisNippleSquirtArmor armorRight = armorRefs[1]
+			int currentLevel = armorLeft.GetLevel()
+			currentLevel = currentLevel + 1
+			if currentLevel > 2
+				currentLevel = 0
+			endif
+			armorLeft.SetLevel(currentLevel)
+			armorRight.SetLevel(currentLevel)
+		; elseif keyCode == 34
+		; 	Console("34")
+		; 	LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
+		; 	LactisNippleSquirtArmor armorLeft = armorRefs[0]
+		; 	LactisNippleSquirtArmor armorRight = armorRefs[1]
+		; 	armorLeft.StartParticleSystem()
+		; 	armorRight.StartParticleSystem()
+		; elseif keyCode == 35
+		; 	Console("35")
+		; 	LactisNippleSquirtArmor[] armorRefs = GetArmorRefs(affectedActor)
+		; 	LactisNippleSquirtArmor armorLeft = armorRefs[0]
+		; 	LactisNippleSquirtArmor armorRight = armorRefs[1]
+		; 	armorLeft.StopParticleSystem()
+		; 	armorRight.StopParticleSystem()
+		EndIf
+	endif
+
+EndEvent
+
+Function Uninstall()
+	Console("Uninstalling Lactis")
+	StopAllNippleSquirts()
+	actorStorage.Clear()
+	UnregisterForAllModEvents()
+	UnregisterForAllKeys()	
+	Reset()
+	Stop()
+EndFunction
+
 Function RemapStartLactatingKey(Int zKey)
 	Console("Remapping ToggleNippleSquirt to "+ zKey)	
 	UnregisterForKey(StartLactatingKey)
@@ -536,6 +537,21 @@ float Function MapValue(float val, float srcMin, float srcMax, float dstMin, flo
 EndFunction	
 
 ; ----------------------------- OStim integration
+
+Function RegisterForOStimEvents()
+	RegisterForModEvent("ostim_orgasm", "OnOstimOrgasm")
+	RegisterForModEvent("ostim_spank", "OnOstimSpank")			
+	RegisterForModEvent("ostim_prestart", "OnOStimPrestart")
+	RegisterForModEvent("ostim_end", "OnOStimEnd")		
+	; RegisterForModEvent("ostim_animationchanged", "OnOstimAnimationChanged")		
+EndFunction
+
+Function UnregisterForOStimEvents()
+	UnregisterForModEvent("ostim_orgasm")
+	UnregisterForModEvent("ostim_spank")
+	UnregisterForModEvent("ostim_prestart")
+	UnregisterForModEvent("ostim_end")
+EndFunction
 
 Event OnOStimOrgasm(string eventName, string strArg, float numArg, Form sender)	
 	; Console("OnOStimOrgasm: eventName=" + eventName + ", strArg=" + strArg + ", numArg="+ numArg)
