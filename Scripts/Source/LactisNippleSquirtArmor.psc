@@ -37,7 +37,7 @@ Event OnInit()
     baseObject = self.GetBaseObject()
     armorAA = (baseObject as Armor).GetNthArmorAddon(0)
     ; OnInit the actorRef will always be the default value set in the CK (set to PlayerRef there)    
-    Console("OnInit: actorName=" + ", self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef + ", EmitterScale=" + EmitterScale)
+    ; Console("OnInit: actorName=" + ", self=" + self + ", baseObject=" + baseObject + ", ActorRef=" + ActorRef + ", EmitterScale=" + EmitterScale)
     ; Thus the update here will be wasted when the actor is not the player after container change    
     
     rot = new Float[3]
@@ -175,12 +175,30 @@ Function UpdateNodeProperties()
 	endif
     NetImmerse.SetNodeLocalPosition(ActorRef, LactisGroupName, NippleOffset, false)
     float totalScale = GlobalEmitterScale*EmitterScale
-    Console("UpdateNodeProperties: actorRef=" + ActorRef + ", GlobalEmitterScale=" + GlobalEmitterScale + ", EmitterScale=" + EmitterScale + ", totalScale=" + totalScale)
+    ; Console("UpdateNodeProperties: actorRef=" + ActorRef + ", GlobalEmitterScale=" + GlobalEmitterScale + ", EmitterScale=" + EmitterScale + ", totalScale=" + totalScale)
     NetImmerse.SetNodeScale(ActorRef, LactisGroupName, totalScale, false)    
     ; NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 23, -1, 2, false)
     
     ActorRef.QueueNiNodeUpdate()
 EndFunction
+
+; Experimental. Does not work.
+; Function StartParticleSystem()
+;     Console("StartParticleSystem")
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 0, 0, false)
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 1, 0, false)
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 2, 0, false)
+;     ActorRef.QueueNiNodeUpdate()
+; EndFunction
+
+; Experimental. Does not work.
+; Function StopParticleSystem()
+;     Console("StopParticleSystem")
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 0, -1.0, false)
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 1, -1.0, false)
+;     NiOverride.AddOverrideFloat(ActorRef, true, baseObject as Armor, armorAA, "EmitterParticleSystem", 20, 2, -1.0, false)
+;     ActorRef.QueueNiNodeUpdate()
+; EndFunction
 
 
 Function Console(String msg) 
