@@ -323,29 +323,16 @@ event OnOptionSliderAccept(int option, float value)
 
 	if (option == optionOffsetLeftX)
 		Main.NippleOffsetL[0] = value
-		Main.NippleOffsetR[0] = -value
 		SetSliderOptionValue(optionOffsetLeftX, Main.NippleOffsetL[0], "{2}")
 	elseIf (option == optionOffsetLeftY)
 		Main.NippleOffsetL[2] = value
-		Main.NippleOffsetR[2] = value
 		SetSliderOptionValue(optionOffsetLeftY, Main.NippleOffsetL[2], "{2}")
 	elseIf (option == optionOffsetLeftZ)
 		Main.NippleOffsetL[1] = value
-		Main.NippleOffsetR[1] = value
 		SetSliderOptionValue(optionOffsetLeftZ, Main.NippleOffsetL[1], "{2}")
 	elseIf option == optionEmitterScale
 		Main.EmitterScale = value		
 		SetSliderOptionValue(optionEmitterScale, Main.EmitterScale, "{2}")
-	; elseif (option == optionOffsetRightX)
-	; 	Main.NippleOffsetR[0] = value
-	; 	SetSliderOptionValue(optionOffsetRightX, Main.NippleOffsetR[0], "{2}")        
-	; 	; Main.UpdateArmorRightProperties()
-	; elseIf (option == optionOffsetRightY)
-	; 	Main.NippleOffsetR[2] = value
-	; 	SetSliderOptionValue(optionOffsetRightY, Main.NippleOffsetR[2], "{2}")        
-	; elseIf (option == optionOffsetRightZ)
-	; 	Main.NippleOffsetR[1] = value
-	; 	SetSliderOptionValue(optionOffsetRightZ, Main.NippleOffsetR[1], "{2}")        		
 	elseIf (option == optionGlobalEmitterScale)
 		Main.GlobalEmitterScale = value
 		SetSliderOptionValue(optionGlobalEmitterScale, Main.GlobalEmitterScale, "{2}")        		
