@@ -8,16 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
 
+## [1.1] - 2021-10-31
+### Added
+### Changed
+- Increased the y- and z-axis offset range.
+- Removed console debug output.
+### Fixed
+- Fixed offset alignment of left nipple squirt effect when played during an
+  OStim scene. 
+
 ## [1.0] - 2021-09-17 - github release
-# Added
+### Added
 - Added per NPC nipple squirt effect offset and scale configuration 
   functionality.
 - Added an uninstall option to MCM.
-# Changed
+### Changed
 - Refactored API for easier integration into other mods.
 - Optimized MCM menu.
 - Removed some properties from esp, which are now purely script controlled.
-# Fixed
+### Fixed
 - Fixed initialization of running effects on game load.
 - Fixed OStim enabled option toggling in MCM.
   Lactis now correctly un/registers from/to OStim events when "OStim enabled"
