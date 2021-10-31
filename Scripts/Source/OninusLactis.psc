@@ -77,8 +77,8 @@ float Function GetVersion()
 EndFunction
 
 Function Maintenance()
-	If fVersion < 1.00; <--- Edit this value when updating
-		fVersion = 1.00; and this
+	If fVersion < 1.1; <--- Edit this value when updating
+		fVersion = 1.1; and this
 		Debug.Notification("Now running OninusLactis version: " + fVersion)
 		; Update Code		
 	EndIf	
@@ -88,14 +88,14 @@ Function Maintenance()
 
 	LactisNippleLeakCBBE  = game.GetFormFromFile(0x001D85, "OninusLactis.esp") as EffectShader
 
-	Console("armorActors=" + armorActors)
-	Console("armorRefsLeft=" + armorRefsLeft)	
-	Console("armorRefsRight=" + armorRefsRight)	
+	; Console("armorActors=" + armorActors)
+	; Console("armorRefsLeft=" + armorRefsLeft)	
+	; Console("armorRefsRight=" + armorRefsRight)	
 	If (armorActors.Length==0)
 		armorActors = new Actor[10]
 		armorRefsLeft = new ObjectReference[10]
 		armorRefsRight = new ObjectReference[10]
-		Console("armorActors initialized." + armorActors)			
+		; Console("armorActors initialized." + armorActors)			
 	EndIf	
 
 	actorStorage = (self as Form) as LactisActorStorage
@@ -573,6 +573,10 @@ Function PlayOrgasmSquirt(Actor actorRef)
 	endif
 
 	LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(actorRef, 2)	
+	; the QueueNiNodeUpdate() and Wait() call are required, otherwise the first
+	; equipped armor will not be aligned correctly
+	actorRef.QueueNiNodeUpdate()
+	Utility.Wait(0.05)
 	LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(actorRef, 2)
 	if NippleLeakEnabled
 		StartNippleLeak(actorRef, 10)
@@ -616,10 +620,15 @@ Function PlaySpankSquirt(Actor actorRef)
 		return
 	endif
 
-	Console("PlaySpankSquirt: ostim.GetMaxSpanksAllowed=" + ostim.GetMaxSpanksAllowed() + ", ostim.GetSpankCount" + ostim.GetSpankCount())
+	; Console("PlaySpankSquirt: ostim.GetMaxSpanksAllowed=" + ostim.GetMaxSpanksAllowed() + ", ostim.GetSpankCount" + ostim.GetSpankCount())
 
-	LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(actorRef, 0)
+	LactisNippleSquirtArmor armorLeftRef = StartNippleSquirtLeft(actorRef, 0)		
+	; the QueueNiNodeUpdate() and Wait() call are required, otherwise the first
+	; equipped armor will not be aligned correctly
+	actorRef.QueueNiNodeUpdate()
+	Utility.Wait(0.05)
 	LactisNippleSquirtArmor armorRightRef = StartNippleSquirtRight(actorRef, 0)
+	
 	if NippleLeakEnabled
 		StartNippleLeak(actorRef, 10)
 	endif
