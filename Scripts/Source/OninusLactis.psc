@@ -523,7 +523,7 @@ Function PlayOrgasmSquirt(Actor actorRef)
 	; check the lock to prevent playing another orgasm squirt while one is running
 	; actually this is the same lock used in PlaySpankSquirt() so there should be 
 	; exactly one squirt at any time, no matter if caused by spank or orgasm
-	if actorRef.IsEquipped(NippleSquirtArmor)
+	if HasNippleSquirt(actorRef)
 		return
 	endif
 
@@ -564,7 +564,7 @@ Function PlaySpankSquirt(Actor actorRef)
 	; check the lock to prevent playing another spank squirt while one is running
 	; actually this is the same lock used in PlayOrgasmSquirt() so there should be 
 	; exactly one squirt at any time, no matter if caused by spank or orgasm
-	if actorRef.IsEquipped(NippleSquirtArmor)
+	if HasNippleSquirt(actorRef)
 		return
 	endif
 
