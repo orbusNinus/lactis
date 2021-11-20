@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
 
+## [2.0] 
+### Changed
+- Refactored mod to use only one single armor which contains the armatures for
+  the left and right nipple squirt effect. This results in faster equipping 
+  times and much simpler code.
+- Removed unused sound record from esp.
+
+
 ## [1.1] - 2021-10-31
 ### Added
 ### Changed
