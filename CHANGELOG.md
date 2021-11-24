@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ## [2.0] 
+### Added
+- Added functionality to export and import MCM settings (note that this does 
+  NOT include actor offsets for now).
+- Added LICENSE file. 
 ### Changed
 - Refactored mod to use only one single armor which contains the armatures for
   the left and right nipple squirt effect. This results in faster equipping 

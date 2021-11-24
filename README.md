@@ -8,7 +8,8 @@ This is a visual effect and no milk economy style mod.
 ## Requirements
 + Skyrim: Special Edition (1.5.39+)
 + [SKSE64](https://skse.silverlock.org/) 
-+ [OStim](https://www.nexusmods.com/skyrimspecialedition/mods/40725) and all it's requirements
++ [OStim](https://www.nexusmods.com/skyrimspecialedition/mods/40725) and all 
+  it's requirements (only if you want to use OStim integration)
 + [PapyrusUtil SE v3.9](https://www.nexusmods.com/skyrimspecialedition/mods/13048?tab=files) 
 + [CBBE 3BA (3BBB)](https://www.nexusmods.com/skyrimspecialedition/mods/30174) optional
 + [XPMSSE](https://www.nexusmods.com/skyrimspecialedition/mods/1988?tab=files)
@@ -63,6 +64,29 @@ When using standalone mode (key K) on various NPCs, leaving cells and
 saving/reloading save games, there might be issues with save game bloat which 
 I didn't figure out yet. 
 
+## Updating versions
+From my personal experience it is safe to update existing saves with a new 
+version by simply replacing the old version - as long as you ensured to stop
+all active nipple squirt effects via the MCM "Reset all" option before the
+update. After resetting, save!, exit the game and update the mod.
+
+### Updating from <=v1.1 to v2.0
+As v2.0 changes some internals of the mod, simply replacing the old version
+might result in a minimal save game bloat, so if you are a keep-it-clean person
+you should completely uninstall the old version before installing the new one.
+
+
+## MCM settings export
+The MCM setting can be exported to and imported from a file. Choose the option
+"Export MCM settings" in the MCM menu and find the file in your Data folder at
+'SKSE/Plugins/Lactis/MCM_Settings.json'.
+
+Choose "Import MCM settings" to import from the file at the location mentioned
+above.
+
+Note that NPC offsets are NOT exported for now. This feature will be added in a
+future release.
+
 ## Physics
 Developed and works best with CBPC. With SMP nipple offset is somewhat 
 off/delayed.
@@ -73,13 +97,19 @@ off/delayed.
 This mod was developed using XPMSSE and the 3BA body. It was tested by a BHUNP
 user who confirmed that this works, too.
 
+The left/right armor use the **body slots 58/59**.
+
+### v0.4 - v1.1
 The nipple squirt effect is implemented as two armors for the left and the 
-right breast). The armor nif contains particle systems which are attached to 
+right breast. The armor nif contains particle systems which are attached to 
 the **bones named "L Breast03" and "R Breast03"**. I'm not quite sure where 
-these bones come from (I assume XPMSSE) but they need to be present in the 
+these bones come from (I assume XPMSSE) but **they need to be present** in the 
 skeleton for the effect to be working correctly.
 
-The left/right armor use the **body slots 58/59**.
+### v2.0
+The nipple squirt effect is now implemented as one single armor which contains
+the two armatures for the left and right nipple squirt effect. This results in 
+faster equipping times and much simpler code.
 
 ## Known issues
 + Particles look weird from some angles.
