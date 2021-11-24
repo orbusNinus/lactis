@@ -29,6 +29,8 @@ Int optionRandomEmitterScaleEnabled
 Int optionRandomEmitterDeactivationEnabled
 Int optionResetAll
 Int optionUninstall
+Int optionExportMCMSettings
+Int optionImportMCMSettings
 
 ; NPC offsets options
 Int optionNpcConsole
@@ -88,10 +90,6 @@ Event OnPageReset(string page)
         optionOffsetLeftY = AddSliderOption("Up / Down", Main.NippleOffsetL[2], "{2}")
         optionOffsetLeftZ = AddSliderOption("Back / Forth", Main.NippleOffsetL[1], "{2}")
 		optionEmitterScale = AddSliderOption("Emitter scale", Main.EmitterScale, "{2}")
-		; AddHeaderOption("Nipple Offset Right")
-        ; optionOffsetRightX = AddSliderOption("Left / Right", Main.NippleOffsetR[0], "{2}")        
-        ; optionOffsetRightY = AddSliderOption("Up / Down", Main.NippleOffsetR[2], "{2}")
-        ; optionOffsetRightZ = AddSliderOption("Back / Forth", Main.NippleOffsetR[1], "{2}")
 		if Main.HasOStim()
 			AddHeaderOption("OStim integration")
 			optionOStimIntegrationEnabled = AddToggleOption("Enable OStim integration", Main.OStimIntegrationEnabled)
@@ -109,8 +107,7 @@ Event OnPageReset(string page)
 		optionDebugAxisEnabled = AddToggleOption("Enable debug axis", Main.DebugAxisEnabled)
 		optionGlobalEmitterScale = AddSliderOption("Global emitter scale", Main.GlobalEmitterScale, "{2}") 		
 		optionNippleLeakEnabled = AddToggleOption("Enable nipple leak (CBBE EffectShader)", Main.NippleLeakEnabled)
-
-		AddEmptyOption()
+		
 		AddHeaderOption("Maintenance")
 		; optionRandomYRotEnabled = AddToggleOption("Enable random Y rotation", Main.UseRandomYRotation)
 		; optionRandomEmitterScaleEnabled = AddToggleOption("Enable random emitter scale", Main.UseRandomEmitterScale)
@@ -119,9 +116,13 @@ Event OnPageReset(string page)
 		AddTextOption("Active nipple squirts", Main.GetArmoredActorsCount() )
 		optionResetAll = AddTextOption("Reset all", "Click")
 
+		AddHeaderOption("Export / Import MCM Settings")
+		optionExportMCMSettings = AddTextOption("Export MCM settings", "Click")		
+		optionImportMCMSettings = AddTextOption("Import MCM settings", "Click")		
+
 		AddEmptyOption()
-		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
 		optionUninstall = AddTextOption("Uninstall Lactis", "Uninstall")
+		AddTextOption("Version", Main.GetVersion(), OPTION_FLAG_DISABLED)
 	ElseIf Page == "Actor Offsets"		
 		SetCursorFillMode(TOP_TO_BOTTOM)
         AddHeaderOption("Actor Nipple Offsets")
@@ -201,6 +202,30 @@ event OnOptionSelect(int option)
 	ElseIf option == optionUninstall
 		Main.Uninstall()
 		ShowMessage("You should save and exit the game now. Then disable the Lactis mod, start game, reload the save. Walk around, wait some time, save and exit game. Then use Resaver to clean the save.", false)
+	ElseIf option == optionExportMCMSettings		
+		If ShowMessage("Lactis MCM setttings will be exported to file 'SKSE/Plugins/Lactis/MCM_Settings.json'", a_withCancel=true) == true
+			SetOptionFlags(optionExportMCMSettings, OPTION_FLAG_DISABLED)
+			bool result = ExportSettings()
+			If result == true
+				ShowMessage("Lactis MCM settings exported succesfully. You can find the file at 'SKSE/Plugins/Lactis/MCM_Settings.json'", false)
+			else
+				ShowMessage("Lactis MCM settings export failed.", false)
+			endIf
+			SetOptionFlags(optionExportMCMSettings, OPTION_FLAG_NONE)
+		endIf				
+	ElseIf option == optionImportMCMSettings
+		If ShowMessage("Import Lactis MCM settings from 'SKSE/Plugins/Lactis/MCM_Settings.json'?", true) == true
+			SetOptionFlags(optionImportMCMSettings, OPTION_FLAG_DISABLED)			
+			int result = ImportSettings()
+			If result==1
+				ShowMessage("Lactis MCM settings imported succesfully from 'SKSE/Plugins/Lactis/MCM_Settings.json'.", false)
+			elseIf result == 0
+				ShowMessage("Lactis MCM settings file not found. Check if the file exists at 'SKSE/Plugins/Lactis/MCM_Settings.json'", false)
+			else
+				ShowMessage("Lactis MCM settings import failed.", false)
+			endIf
+			SetOptionFlags(optionImportMCMSettings, OPTION_FLAG_NONE)
+		endIf		
 	ElseIf (option == optionNpcConsole)
 		SetSelectedActor(GetTargetActor("Console"))
 	ElseIf optionNpcActors.Find(option)>=0
@@ -238,21 +263,6 @@ event OnOptionSliderOpen(int option)
 		SetSliderDialogDefaultValue(1.0)
 		SetSliderDialogRange(0.1, 4.0)
 		SetSliderDialogInterval(0.1)
-	; elseif (option == optionOffsetRightX)
-	; 	SetSliderDialogStartValue(Main.NippleOffsetR[0])
-	; 	SetSliderDialogDefaultValue(0.0)
-	; 	SetSliderDialogRange(-7, 7)
-	; 	SetSliderDialogInterval(0.1)
-	; elseIf (option == optionOffsetRightY)
-	; 	SetSliderDialogStartValue(Main.NippleOffsetR[2])
-	; 	SetSliderDialogDefaultValue(0.0)
-	; 	SetSliderDialogRange(-7, 7)
-	; 	SetSliderDialogInterval(0.1)
-	; elseIf (option == optionOffsetRightZ)
-	; 	SetSliderDialogStartValue(Main.NippleOffsetR[1])
-	; 	SetSliderDialogDefaultValue(0.0)
-	; 	SetSliderDialogRange(-7, 7)
-	; 	SetSliderDialogInterval(0.1)
 	elseIf (option == optionGlobalEmitterScale)
 		SetSliderDialogStartValue(Main.GlobalEmitterScale)
 		SetSliderDialogDefaultValue(1.0)
@@ -483,4 +493,72 @@ Actor[] Function GetNearbyFemaleActors()
 	endwhile
 
 	return actors
+EndFunction
+
+
+Bool Function ExportSettings()
+	String filename = "../Lactis/MCM_Settings"
+	Bool result
+
+	JsonUtil.SetIntValue(filename, "optionKeyStartLactating", Main.StartLactatingKey as int)
+	JsonUtil.SetFloatValue(filename, "optionOffsetLeftX", Main.NippleOffsetL[0])
+	JsonUtil.SetFloatValue(filename, "optionOffsetLeftY", Main.NippleOffsetL[2])
+	JsonUtil.SetFloatValue(filename, "optionOffsetLeftZ", Main.NippleOffsetL[1])
+	JsonUtil.SetIntValue(filename, "optionOStimIntegrationEnabled", Main.OStimIntegrationEnabled as int)
+	JsonUtil.SetFloatValue(filename, "optionOStimSpankSquirtDuration", Main.OStimSpankSquirtDuration)	
+	JsonUtil.SetFloatValue(filename, "optionOStimOrgasmSquirtDuration", Main.OStimOrgasmSquirtDuration)
+	JsonUtil.SetIntValue(filename, "optionOStimNonNakedSquirtEnabled", Main.OStimNonNakedSquirtEnabled as int)
+	JsonUtil.SetIntValue(filename, "optionDebugAxisEnabled", Main.DebugAxisEnabled as int)
+	JsonUtil.SetFloatValue(filename, "optionGlobalEmitterScale", Main.GlobalEmitterScale)
+	JsonUtil.SetIntValue(filename, "optionNippleLeakEnabled", Main.NippleLeakEnabled as int)
+
+	result = JsonUtil.Save(filename)
+	Return result
+EndFunction
+
+Int Function ImportSettings()
+	String filename = "../Lactis/MCM_Settings"
+
+	If JsonUtil.JsonExists(filename) == false
+		return 0
+	elseIf JsonUtil.IsGood(filename) == false
+		return -1
+	endIf
+
+	Main.StartLactatingKey = JsonUtil.GetIntValue(filename, "optionKeyStartLactating")
+	Main.RemapStartLactatingKey(Main.StartLactatingKey)
+	SetKeyMapOptionValue(optionKeyStartLactating, Main.StartLactatingKey)
+
+	Main.NippleOffsetL[0] = JsonUtil.GetFloatValue(filename, "optionOffsetLeftX")
+	SetSliderOptionValue(optionOffsetLeftX, Main.NippleOffsetL[0], "{2}")
+
+	Main.NippleOffsetL[2] = JsonUtil.GetFloatValue(filename, "optionOffsetLeftY")
+	SetSliderOptionValue(optionOffsetLeftY, Main.NippleOffsetL[2], "{2}")
+
+	Main.NippleOffsetL[1] = JsonUtil.GetFloatValue(filename, "optionOffsetLeftZ")
+	SetSliderOptionValue(optionNpcOffsetLeftY, Main.NippleOffsetL[1], "{2}")
+
+	Main.OStimIntegrationEnabled = JsonUtil.GetIntValue(filename, "optionOStimIntegrationEnabled") as bool
+	SetToggleOptionValue(optionOStimIntegrationEnabled, Main.OStimIntegrationEnabled) 
+
+	Main.OStimSpankSquirtDuration = JsonUtil.GetFloatValue(filename, "optionOStimSpankSquirtDuration") 
+	SetSliderOptionValue(optionOStimSpankSquirtDuration, Main.OStimSpankSquirtDuration, "{2}")    
+
+	Main.OStimOrgasmSquirtDuration = JsonUtil.GetFloatValue(filename, "optionOStimOrgasmSquirtDuration") 
+	SetSliderOptionValue(optionOStimOrgasmSquirtDuration, Main.OStimOrgasmSquirtDuration, "{2}")    
+
+	Main.OStimNonNakedSquirtEnabled = JsonUtil.GetIntValue(filename, "optionOStimNonNakedSquirtEnabled") as bool
+	SetToggleOptionValue(optionOStimNonNakedSquirtEnabled, Main.OStimNonNakedSquirtEnabled) 
+
+	Main.DebugAxisEnabled = JsonUtil.GetIntValue(filename, "optionDebugAxisEnabled") as bool
+	SetToggleOptionValue(optionDebugAxisEnabled, Main.DebugAxisEnabled) 
+
+	Main.GlobalEmitterScale = JsonUtil.GetFloatValue(filename, "optionGlobalEmitterScale") 
+	SetSliderOptionValue(optionGlobalEmitterScale, Main.GlobalEmitterScale, "{2}")    
+
+	Main.NippleLeakEnabled = JsonUtil.GetIntValue(filename, "optionNippleLeakEnabled") as bool
+	SetToggleOptionValue(optionNippleLeakEnabled, Main.NippleLeakEnabled) 
+
+	ForcePageReset()
+	return 1
 EndFunction
